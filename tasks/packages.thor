@@ -9,6 +9,7 @@ require_relative 'common'
 
 class Packages < Thor
   desc 'clone [PACKAGES]', 'Clone packages into packages/ directory (default: clone all)'
+  option :head, type: :boolean
   def clone(*packages)
     packages = config.packages[:packages].keys if packages.empty?
     prefix = config.packages[:prefix]
@@ -17,7 +18,12 @@ class Packages < Thor
       Parallel.each(packages) do |pkg|
         version = config.packages[:packages][pkg.to_sym].gsub(':', '_')
         tag = "#{pkg}-#{version}"
-        run! %(git clone --branch '#{tag}' '#{prefix}#{pkg}')
+        run! %(git clone '#{prefix}#{pkg}')
+        unless options[:head]
+          Dir.chdir(pkg) do
+            run! %(git checkout '#{tag}')
+          end
+        end
       end
     end
   end
