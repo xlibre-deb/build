@@ -12,6 +12,7 @@ class Repos < Thor
   desc 'clone [REPOS]', 'Clone repos into repos/ directory (default: clone all)'
   def clone(*repos)
     repos = config.matrix.without_disabled.keys if repos.empty?
+    FileUtils.mkdir_p('repos')
     Dir.chdir('repos') do
       Parallel.each(repos) do |name|
         repo_url = config.matrix[name.to_sym][:vars][:repo]

@@ -12,9 +12,10 @@ class Packages < Thor
   def clone(*packages)
     packages = config.packages[:packages].keys if packages.empty?
     prefix = config.packages[:prefix]
+    FileUtils.mkdir_p('packages')
     Dir.chdir('packages') do
       Parallel.each(packages) do |pkg|
-        version = config.packages[pkg.to_sym]
+        version = config.packages[:packages][pkg.to_sym].gsub(':', '_')
         tag = "#{pkg}-#{version}"
         run! %(git clone --branch '#{tag}' '#{prefix}#{pkg}')
       end
