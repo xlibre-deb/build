@@ -1,0 +1,59 @@
+debian:
+  codenames:
+    - trixie
+    - forky
+    - sid
+  suites:
+    oldstable:
+    stable: trixie
+    testing: forky
+    unstable: sid
+  arch:
+    - amd64
+  vars:
+    repo: https://github.com/xlibre-deb/debian
+    data_url: https://debian.pages.debian.net/distro-info-data/debian.csv
+    release_url: https://deb.debian.org/debian/dists/%{release}/Release
+    image: debian
+    systemd: true
+    min_version: 13
+    exclude:
+      - experimental
+devuan:
+  disabled: true
+  codenames:
+    - excalibur
+    - freia
+    - ceres
+  suites:
+    oldstable:
+    stable:
+    testing: excalibur
+    unstable: ceres
+  arch:
+    - amd64
+  vars:
+    repo: https://github.com/xlibre-deb/devuan
+    data_url: https://git.devuan.org/devuan/distro-info-data/raw/branch/suites/unstable/devuan.csv
+    release_url: http://deb.devuan.org/merged/dists/%{release}/Release
+    image: devuan/devuan
+    systemd: false
+    min_version: 6
+    exclude:
+      - experimental
+ubuntu:
+  disabled: true
+  codenames:
+    - plucky
+    - questing
+  suites:
+  arch:
+    - amd64
+  vars:
+    repo: https://github.com/xlibre-deb/ubuntu
+    data_url: https://debian.pages.debian.net/distro-info-data/ubuntu.csv
+    release_url: http://archive.ubuntu.com/ubuntu/dists/%{release}/Release
+    image: ubuntu
+    systemd: true
+    min_version: 25.04
+    exclude:
