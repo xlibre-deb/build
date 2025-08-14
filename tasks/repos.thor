@@ -63,7 +63,16 @@ class Repos < Thor
       codenames = data[:codenames]
       arch_list = data[:arch]
 
+      FileUtils.mkdir_p("repos/#{name}/")
       FileUtils.cp('misc/key.asc', "repos/#{name}/")
+
+      FileUtils.mkdir_p("repos/#{name}/dists")
+      Dir.chdir("repos/#{name}/dists") do
+        data[:suites]&.each do |suite, release|
+          FileUtils.remove_file(suite.to_s) if File.symlink?(suite.to_s)
+          File.symlink(release.to_s, suite.to_s) unless release.nil?
+        end
+      end
 
       Dir.chdir("repos/#{name}") do
         codenames.each do |release|
