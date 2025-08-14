@@ -11,7 +11,7 @@ class Build < Thor
 
   desc 'list-targets', 'List build targets'
   def list_targets
-    puts matrix.without_disabled.target_names.join("\n")
+    puts config.matrix.without_disabled.target_names.join("\n")
   end
 
   desc 'target TARGET', 'Build packages for a specific target'
@@ -37,15 +37,6 @@ class Build < Thor
     )
   end
 
-  desc 'sign', 'Sign build artifacts in output directory'
-  def sign
-    files = Dir.glob('output/*/*.{changes,dsc}')
-    files.each do |path|
-      puts "# Sign: #{path}"
-      run! %(debsign --no-re-sign #{path})
-    end
-  end
-
   desc 'bake', 'Build using docker bake file'
   def bake
     run! %(docker buildx bake --no-cache)
@@ -59,7 +50,7 @@ class Bake < Thor
   option :targets, type: :array, desc: 'targets to build (default: all)'
   option :packages, type: :array, desc: 'packages to build (default: all)'
   def gen
-    targets = options[:targets] || matrix.without_disabled.target_names
+    targets = options[:targets] || config.matrix.without_disabled.target_names
     packages = options[:packages]&.join(' ') || '*'
 
     buf = StringIO.new

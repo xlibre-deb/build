@@ -23,9 +23,9 @@ Untracked:
 ### Build
 #### Requirements
 
+- thor (ruby-thor)
 - docker
 - docker-buildx
-- thor (ruby-thor)
 
 #### Prepare build environments
 
@@ -76,8 +76,8 @@ The build results will be stored in the `output/` directory.
 #### Requirements
 
 - thor (ruby-thor)
-- devscripts
-- reprepro
+- apt-utils
+- xv
 - gpg (with signing key)
 
 Clone the repositories:
@@ -87,20 +87,18 @@ thor repos:clone
 ls repos/
 ```
 
-#### Sign build artifacts
-
-Sign the build artifacts in the `output/` directory.
-
-```
-thor build:sign
-```
-
 #### Include packages
 
 Add the built packages from the `output/` directory to the repos.
 
 ```
 thor repos:include
+```
+
+#### Update repo metadata
+
+```
+thor repos:update
 ```
 
 ## Misc

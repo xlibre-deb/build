@@ -1,3 +1,12 @@
+require 'bundler/inline'
+gemfile do
+  source 'https://rubygems.org'
+  gem 'csv'
+end
+
+require 'singleton'
+require 'csv'
+
 module MatrixData
   def without_disabled
     self.select { |k, v| v[:disabled] != true }.extend(MatrixData)
@@ -30,6 +39,9 @@ module MatrixData
   end
 end
 
+module PackagesData
+end
+
 class String
   def normalize_codename
     self.split.first.downcase
@@ -49,14 +61,47 @@ class String
   end
 end
 
-def matrix
-  if $matrix.nil?
-    $matrix = YAML.load_file('matrix.yaml', symbolize_names: true)
-    $matrix.extend(MatrixData)
+class Config
+  include Singleton
+
+  def matrix
+    if @matrix.nil?
+      @matrix = YAML.load_file('matrix.yaml', symbolize_names: true)
+      @matrix.extend(MatrixData)
+    end
+    @matrix
   end
-  $matrix
+
+  def packages
+    if @matrix.nil?
+      @matrix = YAML.load_file('packages.yaml', symbolize_names: true)
+      @matrix.extend(PackagesData)
+    end
+    @matrix
+  end
+end
+
+def config
+  Config.instance
 end
 
 def run!(*args)
   system(*args, exception: true)
+end
+
+def key_fingerprint
+  if !File.exist?('misc/key.asc')
+    raise "Missing file 'misc/key.asc'"
+  end
+  text = %x(gpg --show-keys --with-colons misc/key.asc)
+  rows = CSV.parse(text, col_sep: ':').reverse
+  rows.each_with_index do |row, idx|
+    type = row[0]
+    next unless ['pub', 'sub'].include?(type)
+    usage = row[11]
+    next unless usage.include?('s') || usage.include?('S')
+    fp = rows[idx-1][9]
+    return fp
+  end
+  raise 'No signing key found in misc/key.asc'
 end
