@@ -16,11 +16,11 @@ class Packages < Thor
     FileUtils.mkdir_p('packages')
     Dir.chdir('packages') do
       Parallel.each(packages) do |pkg|
-        version = config.packages[:packages][pkg.to_sym].gsub(':', '_')
+        version = config.packages[:packages][pkg].gsub(':', '_')
         tag = "#{pkg}-#{version}"
         run! %(git clone '#{prefix}#{pkg}')
         unless options[:head]
-          Dir.chdir(pkg) do
+          Dir.chdir(pkg.to_s) do
             run! %(git checkout '#{tag}')
           end
         end
