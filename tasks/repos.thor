@@ -63,9 +63,6 @@ class Repos < Thor
       codenames = data[:codenames]
       arch_list = data[:arch]
 
-      FileUtils.mkdir_p("repos/#{name}/")
-      FileUtils.cp('misc/key.asc', "repos/#{name}/")
-
       FileUtils.mkdir_p("repos/#{name}/dists")
       Dir.chdir("repos/#{name}/dists") do
         data[:suites]&.each do |suite, release|
