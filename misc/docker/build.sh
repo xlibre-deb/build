@@ -11,12 +11,23 @@ build() {
   path="$1"
   [ -d $path ] || return 0
   cd $path
+  if ! check_arch; then
+    echo "## Skip $path ##"
+    echo "## No packages to build for $(dpkg-architecture -qDEB_HOST_ARCH)"
+    return 0
+  fi
   echo "## Build $path ##"
   apt-get build-dep -y .
   if [ "$path" != /build/xlibre ]; then
     uscan --download-current-version
   fi
   debuild -us -uc
+}
+
+check_arch() {
+  host_arch="$(dpkg-architecture -qDEB_HOST_ARCH)"
+  pkg_arch=" $(grep -i '^Architecture:' debian/control | cut -d' ' -f2- | xargs) "
+  echo "$pkg_arch" | grep -qE " ($host_arch|any-$host_arch|any|all|linux-any) "
 }
 
 build /build/xlibre-server
