@@ -48,12 +48,12 @@ class String
   end
 
   def excluded_codename?(dist)
-    exclude = matrix[dist][:vars][:exclude]
+    exclude = config.matrix[dist][:vars][:exclude]
     !exclude.nil? && exclude.include?(self)
   end
 
   def compatible_version?(dist)
-    minver = matrix[dist][:vars][:min_version].to_s
+    minver = config.matrix[dist][:vars][:min_version].to_s
     return true if minver.nil?
     minver = Gem::Version.new(minver)
     thisver = Gem::Version.new(self.delete_suffix(' LTS'))
@@ -73,11 +73,11 @@ class Config
   end
 
   def packages
-    if @matrix.nil?
-      @matrix = YAML.load_file('packages.yaml', symbolize_names: true)
-      @matrix.extend(PackagesData)
+    if @packages.nil?
+      @packages = YAML.load_file('packages.yaml', symbolize_names: true)
+      @packages.extend(PackagesData)
     end
-    @matrix
+    @packages
   end
 end
 
