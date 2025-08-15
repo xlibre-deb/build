@@ -53,7 +53,7 @@ ubuntu:
   vars:
     repo: https://github.com/xlibre-deb/ubuntu
     data_url: https://debian.pages.debian.net/distro-info-data/ubuntu.csv
-    release_url: http://archive.ubuntu.com/ubuntu/dists/%{release}/Release
+    release_url: https://archive.ubuntu.com/ubuntu/dists/%{release}/Release
     image: ubuntu
     systemd: true
     min_version: 25.04
