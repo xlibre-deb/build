@@ -77,6 +77,7 @@ The build results will be stored in the `output/` directory.
 
 - thor (ruby-thor)
 - apt-utils
+- devscripts
 - xv
 - gpg (with signing key)
 

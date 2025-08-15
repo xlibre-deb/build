@@ -42,6 +42,8 @@ class Repos < Thor
           puts "# Skip (native): #{path}"
           next
         end
+        puts "# Sign: #{path}"
+        run! %(debsign --no-re-sign #{path})
       end
 
       puts "# Include: #{path}"
