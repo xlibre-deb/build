@@ -34,7 +34,7 @@ class Matrix < Thor
 
   no_commands do
     def fetch_supported_releases(dist)
-      data_url = matrix[dist][:vars][:data_url]
+      data_url = config.matrix[dist][:vars][:data_url]
       text = HTTP.get(data_url).to_s
       today = Date.today
 
@@ -53,7 +53,7 @@ class Matrix < Thor
     end
 
     def fetch_codename_for(dist, suite)
-      release_url = matrix[dist][:vars][:release_url]
+      release_url = config.matrix[dist][:vars][:release_url]
       url = sprintf(release_url, { release: suite })
       text = HTTP.get(url).to_s
       codename = text.match(/^Codename: *(.+?) *$/i)[1].normalize_codename
@@ -62,7 +62,7 @@ class Matrix < Thor
     end
 
     def fetch_suites(dist, releases)
-      suites = matrix[dist][:suites]
+      suites = config.matrix[dist][:suites]
       return nil if suites.nil?
       suites = suites.map do |k, v|
         [k, fetch_codename_for(dist, k)]

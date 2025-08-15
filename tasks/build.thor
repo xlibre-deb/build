@@ -18,9 +18,9 @@ class Build < Thor
   option :packages, type: :array, desc: 'packages to build (default: all)'
   def target(target)
     dist, codename, arch = target.split('-').map(&:to_sym)
-    image = matrix[dist][:vars][:image]
+    image = config.matrix[dist][:vars][:image]
     image = "#{image}:#{codename}"
-    systemd = matrix[dist][:vars][:systemd]
+    systemd = config.matrix[dist][:vars][:systemd]
     packages = options[:packages]&.join(' ') || '*'
     run! %(
       docker buildx build \
@@ -70,9 +70,9 @@ class Bake < Thor
 
     targets.each do |target|
       dist, codename, arch = target.split('-').map(&:to_sym)
-      image = matrix[dist][:vars][:image]
+      image = config.matrix[dist][:vars][:image]
       image = "#{image}:#{codename}"
-      systemd = matrix[dist][:vars][:systemd]
+      systemd = config.matrix[dist][:vars][:systemd]
 
       buf.puts
       buf.puts <<~EOF
