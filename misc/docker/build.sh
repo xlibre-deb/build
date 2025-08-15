@@ -2,9 +2,9 @@
 set -e
 
 export DEBIAN_FRONTEND=noninteractive
-
+export DEB_BUILD_OPTIONS=nocheck
 if [ "$SYSTEMD" = true ]; then
-  export DEB_BUILD_OPTIONS=systemd
+  export DEB_BUILD_OPTIONS="systemd $DEB_BUILD_OPTIONS"
 fi
 
 build() {
