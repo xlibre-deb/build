@@ -30,6 +30,10 @@ jobs:
         run: |
           gem install thor
 
+      - name: Clone package repositories
+        run: |
+          thor packages:clone
+
       - name: Build
         run: |
           thor build:bake:gen --arch=$(dpkg-architecture -qDEB_HOST_ARCH)
