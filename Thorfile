@@ -1,5 +1,4 @@
-$rootdir = __dir__
-Dir.chdir($rootdir)
+Dir.chdir(__dir__)
 
 class << Thor
   def exit_on_failure?

@@ -26,7 +26,7 @@ class Matrix < Thor
     if options[:print]
       puts yaml
     else
-      File.open("matrix.yaml", 'w') do |f|
+      File.open('matrix.yaml', 'w') do |f|
         f.puts yaml
       end
     end
@@ -54,7 +54,7 @@ class Matrix < Thor
 
     def fetch_codename_for(dist, suite)
       release_url = config.matrix[dist][:vars][:release_url]
-      url = sprintf(release_url, { release: suite })
+      url = format(release_url, { release: suite })
       text = HTTP.get(url).to_s
       codename = text.match(/^Codename: *(.+?) *$/i)[1].normalize_codename
       return nil if codename.excluded_codename?(dist)
@@ -64,10 +64,10 @@ class Matrix < Thor
     def fetch_suites(dist, releases)
       suites = config.matrix[dist][:suites]
       return nil if suites.nil?
-      suites = suites.map do |k, v|
+      suites = suites.to_h do |k, _v|
         [k, fetch_codename_for(dist, k)]
-      end.to_h
-      suites.merge!(suites) do |k, v|
+      end
+      suites.merge!(suites) do |_k, v|
         next nil if v.nil?
         release = releases.find { |r| r[:codename] == v }
         next nil if release.nil?

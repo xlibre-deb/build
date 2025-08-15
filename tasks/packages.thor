@@ -19,10 +19,9 @@ class Packages < Thor
         version = config.packages[:packages][pkg].to_s.gsub(':', '_')
         tag = "#{pkg}-#{version}"
         run! %(git clone '#{prefix}#{pkg}')
-        unless options[:head]
-          Dir.chdir(pkg.to_s) do
-            run! %(git checkout '#{tag}')
-          end
+        next if options[:head]
+        Dir.chdir(pkg.to_s) do
+          run! %(git checkout '#{tag}')
         end
       end
     end

@@ -48,7 +48,7 @@ class Repos < Thor
 
       puts "# Include: #{path}"
       target = File.basename(File.dirname(path))
-      distro, codename, *_ = target.split('-')
+      distro, codename, = target.split('-')
 
       FileUtils.mkdir_p("repos/#{distro}/dists/#{codename}/pool/main/source")
       FileUtils.cp(path, "repos/#{distro}/dists/#{codename}/pool/main/source/")
@@ -147,7 +147,7 @@ module Apt
     suite = codename if suite.nil?
     template = File.read('../../misc/Release.tmpl')
     values = { codename: release, suite: suite, arch: allarch }
-    text = sprintf(template, values).strip + "\n"
+    text = format(template, values).strip + "\n"
     File.write("dists/#{release}/Release", text)
     run! %(
       apt-ftparchive release dists/#{release}/ \

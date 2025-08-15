@@ -9,11 +9,11 @@ require 'csv'
 
 module MatrixData
   def without_disabled
-    self.select { |k, v| v[:disabled] != true }.extend(MatrixData)
+    reject { |_k, v| v[:disabled] == true }.extend(MatrixData)
   end
 
   def targets
-    self.flat_map do |dist, body|
+    flat_map do |dist, body|
       body[:codenames].product(body[:arch]).map do |codename, arch|
         { dist:, codename:, arch: }
       end
@@ -21,21 +21,21 @@ module MatrixData
   end
 
   def target_names
-    self.targets.map { |v| "#{v.to_h.values.join('-')}" }
+    targets.map { |v| v.to_h.values.join('-') }
   end
 
   def to_yaml
     yaml = stringify(self).to_yaml
-    yaml.gsub!(/\A---\s*\n/, '') # remove header
-    yaml.gsub!(/^( *)-/, '\1  -') # indent array
-    yaml
+    yaml = yaml.gsub(/\A---\s*\n/, '') # remove header
+    yaml.gsub(/^( *)-/, '\1  -') # indent array
   end
 
   private
+
   def stringify(hash)
-    hash.map do |k, v|
+    hash.to_h do |k, v|
       [k.to_s, v.is_a?(Hash) ? stringify(v) : v]
-    end.to_h
+    end
   end
 end
 
@@ -44,7 +44,7 @@ end
 
 class String
   def normalize_codename
-    self.split.first.downcase
+    split.first.downcase
   end
 
   def excluded_codename?(dist)
@@ -56,7 +56,7 @@ class String
     minver = config.matrix[dist][:vars][:min_version].to_s
     return true if minver.nil?
     minver = Gem::Version.new(minver)
-    thisver = Gem::Version.new(self.delete_suffix(' LTS'))
+    thisver = Gem::Version.new(delete_suffix(' LTS'))
     thisver >= minver
   end
 end
@@ -85,8 +85,8 @@ def config
   Config.instance
 end
 
-def run!(*args)
-  system(*args, exception: true)
+def run!(*)
+  system(*, exception: true)
 end
 
 def key_fingerprint
