@@ -10,6 +10,7 @@ debian:
     unstable: sid
   arch:
     - amd64
+    - arm64
   vars:
     repo: https://github.com/xlibre-deb/debian
     data_url: https://debian.pages.debian.net/distro-info-data/debian.csv
