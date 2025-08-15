@@ -49,9 +49,15 @@ class Bake < Thor
   desc 'gen', 'Generate docker bake file'
   option :targets, type: :array, desc: 'targets to build (default: all)'
   option :packages, type: :array, desc: 'packages to build (default: all)'
+  option :arch, type: :array, desc: 'architectures to build (default: all)'
   def gen
     targets = options[:targets] || config.matrix.without_disabled.target_names
     packages = options[:packages]&.join(' ') || '*'
+
+    targets.select! do |target|
+      *_, arch = target.split('-')
+      options[:arch].nil? || options[:arch].include?(arch)
+    end
 
     buf = StringIO.new
     buf.puts <<~EOF
