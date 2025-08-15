@@ -39,7 +39,7 @@ class Build < Thor
 
   desc 'bake', 'Build using docker bake file'
   def bake
-    run! %(docker buildx bake --no-cache)
+    run! %(docker buildx bake)
   end
 end
 
