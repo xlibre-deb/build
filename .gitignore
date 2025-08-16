@@ -2,3 +2,4 @@ docker-bake.hcl
 /output/
 /packages/
 /repos/
+/tmp/

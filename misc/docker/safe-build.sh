@@ -1,7 +1,7 @@
 #!/bin/bash
 set -o pipefail
 
-if SYSTEMD=${SYSTEMD} bash /build/build.sh | tee /tmp/build.log; then
+if SYSTEMD=${SYSTEMD} bash /build/build.sh /build | tee /tmp/build.log; then
   rm -rf /build/build.sh /build/safe-build.sh /build/*/
 else
   mv /build /tmp/failed-build

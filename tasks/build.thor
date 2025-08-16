@@ -1,7 +1,10 @@
 require 'stringio'
+require 'fileutils'
 require_relative 'common'
 
 class Build < Thor
+  include Thor::Actions
+
   desc 'use-remote-builder NAME URL', 'Use remote builder instance'
   def use_remote_builder(name, url)
     run! %(docker buildx rm '#{name}' >/dev/null 2>&1 ||:)
@@ -35,6 +38,48 @@ class Build < Thor
         -f misc/docker/Dockerfile \
         ./
     )
+  end
+
+  desc 'local', 'Build packages on the host system without using Docker. Requires root privileges'
+  option :systemd, type: :boolean, desc: 'enable or disable systemd support'
+  option :packages, type: :array, desc: 'packages to build (default: all)'
+  def local
+    systemd = options[:systemd]
+    packages = options[:packages]&.join(' ') || '*'
+
+    if systemd.nil?
+      $stderr.puts 'Specify --systemd or --no-systemd'
+      exit 1
+    end
+
+    abstmp = File.absolute_path('tmp')
+    if File.exist?(abstmp)
+      unless File.directory?(abstmp)
+        $stderr.puts "'#{abstmp}' exists but is not a directory."
+        exit 1
+      end
+      if yes?("Directory '#{abstmp}' already exists. Delete it to proceed? (y/n)")
+        FileUtils.rm_rf(abstmp, secure: true)
+        if File.exist?(abstmp)
+          $stderr.puts "Directory '#{abstmp}' could not be deleted. Possible permission issue."
+          exit 1
+        end
+      else
+        $stderr.puts 'Stopped.'
+        exit 1
+      end
+    end
+
+    Dir.mkdir(abstmp)
+    run! %(cd packages && cp -r #{packages} ../tmp/)
+
+    install_pgks = %w[devscripts]
+    install_pgks.concat(%w[libdbus-1-dev libsystemd-dev systemd-dev]) if systemd
+    run! 'apt-get', 'update'
+    run! 'env', 'DEBIAN_FRONTEND=noninteractive',
+         'apt-get', 'install', '-y', '--no-install-recommends', *install_pgks
+
+    run! 'env', "SYSTEMD=#{systemd}", 'bash', 'misc/docker/build.sh', abstmp
   end
 
   desc 'bake', 'Build using docker bake file'
