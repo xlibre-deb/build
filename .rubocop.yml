@@ -19,6 +19,8 @@ Naming/HeredocDelimiterNaming:
   Enabled: false
 Style/CommandLiteral:
   EnforcedStyle: percent_x
+Style/ConcatArrayLiterals:
+  Enabled: false
 Style/Documentation:
   Enabled: false
 Style/FrozenStringLiteralComment:
@@ -28,6 +30,8 @@ Style/IfUnlessModifier:
 Style/NegatedIf:
   Enabled: false
 Style/RescueModifier:
+  Enabled: false
+Style/StderrPuts:
   Enabled: false
 Style/StringConcatenation:
   Enabled: false
