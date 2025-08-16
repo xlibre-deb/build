@@ -23,6 +23,8 @@ class Repos < Thor
 
   desc 'include', 'Include built packages in repos'
   def include
+    kp = key_fingerprint
+
     deb_files = Dir.glob('output/*/*.deb')
     deb_files.each do |path|
       puts "# Include: #{path}"
@@ -43,7 +45,7 @@ class Repos < Thor
           next
         end
         puts "# Sign: #{path}"
-        run! %(debsign --no-re-sign #{path})
+        run! %(debsign --re-sign -k #{kp} #{path})
       end
 
       puts "# Include: #{path}"
