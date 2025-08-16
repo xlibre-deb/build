@@ -9,6 +9,7 @@ require 'http'
 require 'csv'
 require 'date'
 require 'yaml'
+require 'json'
 require 'fileutils'
 require_relative 'common'
 
@@ -29,6 +30,25 @@ class Matrix < Thor
       File.open('matrix.yaml', 'w') do |f|
         f.puts yaml
       end
+    end
+  end
+
+  desc 'jobs', 'Output build jobs as JSON'
+  option :runners, type: :hash, required: true, desc: 'runner image for each target'
+  option :compact, type: :boolean
+  def jobs
+    targets = config.matrix.without_disabled.targets
+    runners = options[:runners]
+    targets = targets.filter_map do |target|
+      runner = runners[target[:arch]]
+      next if runner.nil?
+      target[:runner] = runner
+      target
+    end
+    if options[:compact]
+      puts targets.to_json
+    else
+      puts JSON.pretty_generate(targets)
     end
   end
 
