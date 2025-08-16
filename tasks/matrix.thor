@@ -35,6 +35,7 @@ class Matrix < Thor
   no_commands do
     def fetch_supported_releases(dist)
       data_url = config.matrix[dist][:vars][:data_url]
+      released_only = config.matrix[dist][:vars][:released_only]
       text = HTTP.get(data_url).to_s
       today = Date.today
 
@@ -45,6 +46,11 @@ class Matrix < Thor
 
         version = row[:version]
         next false if !version.nil? && !version.compatible_version?(dist)
+
+        if released_only
+          release = Date.parse(row[:release]) rescue nil
+          next false if release.nil? || today < release
+        end
 
         created = Date.parse(row[:created]) rescue nil
         eol = Date.parse(row[:eol]) rescue nil

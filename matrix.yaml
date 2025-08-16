@@ -16,6 +16,7 @@ debian:
     data_url: https://debian.pages.debian.net/distro-info-data/debian.csv
     release_url: https://deb.debian.org/debian/dists/%{release}/Release
     image: debian
+    released_only: false
     systemd: true
     min_version: 13
     exclude:
@@ -38,6 +39,7 @@ devuan:
     data_url: https://git.devuan.org/devuan/distro-info-data/raw/branch/suites/unstable/devuan.csv
     release_url: http://deb.devuan.org/merged/dists/%{release}/Release
     image: devuan/devuan
+    released_only: false
     systemd: false
     min_version: 6
     exclude:
@@ -55,6 +57,7 @@ ubuntu:
     data_url: https://debian.pages.debian.net/distro-info-data/ubuntu.csv
     release_url: https://archive.ubuntu.com/ubuntu/dists/%{release}/Release
     image: ubuntu
+    released_only: true
     systemd: true
     min_version: 25.04
     exclude:
