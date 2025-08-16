@@ -45,13 +45,12 @@ devuan:
     exclude:
       - experimental
 ubuntu:
-  disabled: true
   codenames:
     - plucky
-    - questing
   suites:
   arch:
     - amd64
+    - arm64
   vars:
     repo: https://github.com/xlibre-deb/ubuntu
     data_url: https://debian.pages.debian.net/distro-info-data/ubuntu.csv
