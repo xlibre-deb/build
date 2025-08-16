@@ -148,7 +148,7 @@ module Apt
   end
 
   def self.release(release, suite, allarch)
-    suite = codename if suite.nil?
+    suite = release if suite.nil?
     template = File.read('../../misc/Release.tmpl')
     values = { codename: release, suite: suite, arch: allarch }
     text = format(template, values).strip + "\n"
