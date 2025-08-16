@@ -23,8 +23,6 @@ class Repos < Thor
 
   desc 'include', 'Include built packages in repos'
   def include
-    kp = key_fingerprint
-
     deb_files = Dir.glob('output/*/*.deb')
     deb_files.each do |path|
       puts "# Include: #{path}"
@@ -44,8 +42,6 @@ class Repos < Thor
           puts "# Skip (native): #{path}"
           next
         end
-        puts "# Sign: #{path}"
-        run! %(debsign --re-sign -k #{kp} #{path})
       end
 
       puts "# Include: #{path}"
@@ -66,6 +62,12 @@ class Repos < Thor
       data = config.matrix[name.to_sym]
       codenames = data[:codenames]
       arch_list = data[:arch]
+
+      dsc_files = Dir.glob("repos/#{name}/**/*.dsc")
+      dsc_files.each do |path|
+        puts "# Sign: #{path}"
+        run! %(debsign --re-sign -k #{kp} #{path} >/dev/null)
+      end
 
       FileUtils.mkdir_p("repos/#{name}/dists")
       Dir.chdir("repos/#{name}/dists") do
