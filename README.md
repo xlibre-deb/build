@@ -50,17 +50,9 @@ Untracked:
 
 #### Build packages
 
-```
-# Build for all distributions, releases, and architectures
-thor build:bake:gen # Creates docker-bake.hcl
-thor build:bake
-
-# Build for specific targets
-thor build:bake:gen --targets debian-trixie-amd64 debian-forky-amd64
-thor build:bake
-
-# Build specific package(s) only
-thor build:bake:gen --packages xlibre-server xserver-xlibre-input-libinput
+```sh
+# Generate docker-bake.hcl for targets (all by default) and build
+thor build:bake:gen # [--targets] [--packages] [--arch]
 thor build:bake
 
 # Build single target without bake file
@@ -68,6 +60,10 @@ thor build:target debian-sid-amd64 # [--packages]
 
 # List targets
 thor build:list-targets
+
+# Build packages on the host system without using Docker
+sudo thor build:local --systemd # [--no-systemd] [--packages]
+ls tmp/*.deb
 ```
 
 The build results will be stored in the `output/` directory.
