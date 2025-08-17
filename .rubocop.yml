@@ -23,6 +23,8 @@ Style/ConcatArrayLiterals:
   Enabled: false
 Style/Documentation:
   Enabled: false
+Style/FetchEnvVar:
+  Enabled: false
 Style/FrozenStringLiteralComment:
   Enabled: false
 Style/IfUnlessModifier:
