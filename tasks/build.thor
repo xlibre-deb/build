@@ -21,6 +21,7 @@ class Build < Thor
 
   desc 'target TARGET', 'Build packages for a specific target'
   option :packages, type: :array, desc: 'packages to build (default: all)'
+  option :no_check, type: :boolean, desc: 'skip build result check'
   def target(target)
     require_commands! %w(docker)
 
@@ -42,6 +43,12 @@ class Build < Thor
         -f misc/docker/Dockerfile \
         ./
     )
+
+    return if options[:no_check]
+    if !File.exist?("output/#{target}/build-status") ||
+        File.read("output/#{target}/build-status").strip != 'success'
+      abort "Build failed! See output at: output/#{target}/"
+    end
   end
 
   desc 'local', 'Build packages on the host system without using Docker. Requires root privileges'
@@ -89,9 +96,18 @@ class Build < Thor
   end
 
   desc 'bake', 'Build using docker bake file'
+  option :no_check, type: :boolean, desc: 'skip build result check'
   def bake
     require_commands! %w(docker)
     run! %(docker buildx bake)
+
+    return if options[:no_check]
+    Dir.glob('output/*/') do |dir|
+      if !File.exist?("#{dir}/build-status") ||
+          File.read("#{dir}/build-status").strip != 'success'
+        abort "Build failed! See output at: output/*/"
+      end
+    end
   end
 end
 
