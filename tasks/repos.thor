@@ -12,7 +12,7 @@ class Repos < Thor
   desc 'clone [REPOS]', 'Clone repos into repos/ directory (default: clone all)'
   option :test, type: :boolean, default: true, desc: 'clone *-test repos instead'
   def clone(*repos)
-    require_commands! %w(git)
+    require_commands! %w[git]
 
     repos = config.matrix.without_disabled.keys if repos.empty?
     FileUtils.mkdir_p('repos')
@@ -59,7 +59,7 @@ class Repos < Thor
 
   desc 'update [REPOS]', 'Update repo metadata (default: update all repos)'
   def update(*repos)
-    require_commands! %w(debsign apt-ftparchive gpg xz)
+    require_commands! %w[debsign apt-ftparchive gpg xz]
 
     repos = config.matrix.without_disabled.keys if repos.empty?
     kp = key_fingerprint

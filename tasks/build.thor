@@ -7,7 +7,7 @@ class Build < Thor
 
   desc 'use-remote-builder NAME URL', 'Use remote builder instance'
   def use_remote_builder(name, url)
-    require_commands! %w(docker)
+    require_commands! %w[docker]
 
     run! %(docker buildx rm '#{name}' >/dev/null 2>&1 ||:)
     run! %(docker buildx create --name '#{name}' --driver=remote '#{url}')
@@ -23,7 +23,7 @@ class Build < Thor
   option :packages, type: :array, desc: 'packages to build (default: all)'
   option :no_check, type: :boolean, desc: 'skip build result check'
   def target(target)
-    require_commands! %w(docker)
+    require_commands! %w[docker]
 
     dist, codename, arch = target.split('-').map(&:to_sym)
     image = config.matrix[dist][:vars][:image]
@@ -55,7 +55,7 @@ class Build < Thor
   option :systemd, type: :boolean, desc: 'enable or disable systemd support'
   option :packages, type: :array, desc: 'packages to build (default: all)'
   def local
-    require_commands! %w(uscan debuild apt-get dpkg-architecture)
+    require_commands! %w[uscan debuild apt-get dpkg-architecture]
 
     systemd = options[:systemd]
     packages = options[:packages]&.join(' ') || '*'
@@ -98,14 +98,14 @@ class Build < Thor
   desc 'bake', 'Build using docker bake file'
   option :no_check, type: :boolean, desc: 'skip build result check'
   def bake
-    require_commands! %w(docker)
+    require_commands! %w[docker]
     run! %(docker buildx bake)
 
     return if options[:no_check]
     Dir.glob('output/*/') do |dir|
       if !File.exist?("#{dir}/build-status") ||
           File.read("#{dir}/build-status").strip != 'success'
-        abort "Build failed! See output at: output/*/"
+        abort 'Build failed! See output at: output/*/'
       end
     end
   end

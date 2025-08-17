@@ -11,7 +11,7 @@ class Packages < Thor
   desc 'clone [PACKAGES]', 'Clone packages into packages/ directory (default: clone all)'
   option :head, type: :boolean
   def clone(*packages)
-    require_commands! %w(git)
+    require_commands! %w[git]
 
     packages = config.packages[:packages].keys if packages.empty?
     prefix = config.packages[:prefix]
