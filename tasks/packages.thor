@@ -44,31 +44,21 @@ class Version < Thor
 
   desc 'new [PACKAGES]', 'Add a new version to each package (default: all)'
   option :version, desc: 'new version (default: increase)'
-  option :since, desc: 'start reading commit messages at this commit-ish'
+  option :release, type: :boolean, desc: 'finalize package changelogs for release'
+  option :commit, type: :boolean, desc: 'commit package version changes'
   def new(*packages)
     require_commands! %w[gbp]
 
     opts = []
     opts.push('--new-version', options[:version]) if options[:version]
-    opts.push('--since', options[:since]) if options[:since]
+    opts.push('--release') if options[:release]
+    opts.push('--commit') if options[:commit]
 
     each_pkg(packages) do |pkg|
       tag_format = 'xlibre/%(version)s'
       puts "# Update the package version: #{pkg}"
       run! 'gbp', 'dch', '--git-author', *opts,
            '--debian-tag', tag_format, '--ignore-branch'
-    end
-  end
-
-  desc 'release [PACKAGES]', 'Finalize package changelogs for release (default: all packages)'
-  def release(*packages)
-    require_commands! %w[gbp]
-    each_pkg(packages) do |pkg|
-      tag_format = 'xlibre/%(version)s'
-      puts "# Release package: #{pkg}"
-      run! 'gbp', 'dch', '--git-author',
-           '--debian-tag', tag_format, '--ignore-branch',
-           '--release'
     end
   end
 
