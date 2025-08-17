@@ -15,13 +15,15 @@ class Packages < Thor
 
     packages = config.packages[:packages].keys if packages.empty?
     prefix = config.packages[:prefix]
+    head = options[:head].nil? ? config.packages[:head] : options[:head]
+
     FileUtils.mkdir_p('packages')
     Dir.chdir('packages') do
       Parallel.each(packages) do |pkg|
         version = config.packages[:packages][pkg].to_s.mangle
         tag = "xlibre/#{version}"
         run! %(git clone '#{prefix}#{pkg}')
-        next if options[:head]
+        next if head
         Dir.chdir(pkg.to_s) do
           run! %(git checkout '#{tag}')
         end
