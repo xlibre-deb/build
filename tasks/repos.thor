@@ -10,6 +10,7 @@ require_relative 'common'
 
 class Repos < Thor
   desc 'clone [REPOS]', 'Clone repos into repos/ directory (default: clone all)'
+  option :test, type: :boolean, default: true, desc: 'clone *-test repos instead'
   def clone(*repos)
     require_commands! %w(git)
 
@@ -18,7 +19,8 @@ class Repos < Thor
     Dir.chdir('repos') do
       Parallel.each(repos) do |name|
         repo_url = config.matrix[name.to_sym][:vars][:repo]
-        run! %(git clone #{repo_url})
+        repo_url = "#{repo_url}-test" if options[:test]
+        run! %(git clone #{repo_url} #{name})
       end
     end
   end
