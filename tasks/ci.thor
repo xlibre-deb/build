@@ -16,6 +16,7 @@ require_relative 'common'
 
 GITHUB_API_URL = 'https://api.github.com/repos/xlibre-deb/build'.freeze
 GITHUB_API_VERSION = '2022-11-28'.freeze
+BUILD_WORKFLOW = 'build-packages'.freeze
 
 class CI < Thor
 end
@@ -28,6 +29,7 @@ class Runs < Thor
   desc 'list', 'List workflow runs'
   option :n, type: :numeric, default: 8, desc: 'Print last N runs only'
   option :success, type: :boolean, desc: 'Print successful runs only'
+  option :name, desc: 'Filter by workflow name'
   def list
     token = options[:token] || ENV['GITHUB_TOKEN']
     token = nil if token.strip.empty?
@@ -41,6 +43,7 @@ class Runs < Thor
     result = JSON.parse(text, symbolize_names: true)
     runs = result[:workflow_runs]
     runs.filter! { |run| run[:conclusion] == 'success' } if options[:success]
+    runs.filter! { |run| run[:name] == options[:name] } if options[:name]
     rows = runs.first(options[:n]).map do |run|
       [
         run[:id],
@@ -57,9 +60,9 @@ class Runs < Thor
     puts table
   end
 
-  desc 'last', 'Get last successful run'
-  def last
-    invoke :list, [], n: 1, success: true
+  desc 'last [WORKFLOW_NAME]', 'Get last successful run (default: last successful build workflow)'
+  def last(name = BUILD_WORKFLOW)
+    invoke :list, [], n: 1, success: true, name: name
   end
 end
 
