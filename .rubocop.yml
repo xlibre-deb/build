@@ -3,6 +3,8 @@ AllCops:
   TargetRubyVersion: 3.4
 Layout/EmptyLineAfterGuardClause:
   Enabled: false
+Layout/MultilineOperationIndentation:
+  Enabled: false
 Layout/SpaceAroundOperators:
   Enabled: false
 Metrics/AbcSize:
