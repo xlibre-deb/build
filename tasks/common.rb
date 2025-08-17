@@ -59,6 +59,17 @@ class String
     thisver = Gem::Version.new(delete_suffix(' LTS'))
     thisver >= minver
   end
+
+  def ellipsize(max_length, keep_tail: false)
+    return self if length <= max_length
+    truncated_length = max_length - 3
+    return '' if truncated_length <= 0
+    if keep_tail
+      '...' + self[-truncated_length..]
+    else
+      self[0...truncated_length] + '...'
+    end
+  end
 end
 
 class Config
