@@ -19,16 +19,15 @@ jobs:
           ruby-version: '3.4'
           bundler-cache: true
 
+      - name: Install cargo-binstall
+        uses: cargo-bins/cargo-binstall@main
+
       - name: Install requirements
         run: |
           sudo apt-get update
           sudo apt-get install -y shellcheck
+          cargo binstall typos-cli
           gem install thor rubocop
-
-      - name: Install typos using cargo
-        uses: baptiste0928/cargo-install@v3
-        with:
-          crate: typos-cli
 
       - name: Check code quality
         run: |
