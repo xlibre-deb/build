@@ -31,12 +31,14 @@ check_arch() {
   echo "$pkg_arch" | grep -qE " ($host_arch|any-$host_arch|any|all|linux-any) "
 }
 
+build "$BUILD_DIR/xlibre"
+apt-get install -y "$BUILD_DIR"/xlibre-x11-common*.deb
+
 build "$BUILD_DIR/xlibre-server"
-apt-get install -y "$BUILD_DIR"/*.deb
+apt-get install -y "$BUILD_DIR"/xserver-xlibre-dev*.deb
 
 if ls "$BUILD_DIR"/xserver-xlibre-*/ >/dev/null 2>&1; then
   for path in "$BUILD_DIR"/xserver-xlibre-*/; do
     build "$path"
   done
 fi
-build "$BUILD_DIR/xlibre"
