@@ -35,5 +35,9 @@ Style/StderrPuts:
   Enabled: false
 Style/StringConcatenation:
   Enabled: false
+Style/TrailingCommaInArrayLiteral:
+  Enabled: false
+Style/TrailingCommaInHashLiteral:
+  Enabled: false
 Style/WordArray:
   Enabled: false
