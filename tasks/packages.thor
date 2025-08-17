@@ -29,3 +29,56 @@ class Packages < Thor
     end
   end
 end
+
+class Version < Thor
+  namespace 'packages:version'
+
+  desc 'get [PACKAGES]', 'Show package versions (default: all)'
+  def get(*packages)
+    require_commands! %w[dpkg-parsechangelog]
+    each_pkg(packages) do |pkg|
+      version = %x(dpkg-parsechangelog --show-field Version)
+      puts "#{pkg}: #{version}"
+    end
+  end
+
+  desc 'new [PACKAGES]', 'Add a new version to each package (default: all)'
+  option :version, desc: 'new version (default: increase)'
+  option :since, desc: 'start reading commit messages at this commit-ish'
+  def new(*packages)
+    require_commands! %w[gbp]
+
+    opts = []
+    opts.push('--new-version', options[:version]) if options[:version]
+    opts.push('--since', options[:since]) if options[:since]
+
+    each_pkg(packages) do |pkg|
+      tag_format = "#{pkg}-%(version)s"
+      puts "# Update the package version: #{pkg}"
+      run! 'gbp', 'dch', '--git-author', *opts,
+           '--debian-tag', tag_format, '--ignore-branch'
+    end
+  end
+
+  desc 'release [PACKAGES]', 'Finalize package changelogs for release (default: all packages)'
+  def release(*packages)
+    require_commands! %w[gbp]
+    each_pkg(packages) do |pkg|
+      tag_format = "#{pkg}-%(version)s"
+      puts "# Release package: #{pkg}"
+      run! 'gbp', 'dch', '--git-author',
+           '--debian-tag', tag_format, '--ignore-branch',
+           '--release'
+    end
+  end
+
+  no_commands do
+    def each_pkg(packages, &block)
+      Dir.glob('packages/*/').each do |dir|
+        pkg = File.basename(dir)
+        next if !packages.empty? && !packages.include?(pkg)
+        Dir.chdir(dir) { block.call(pkg) }
+      end
+    end
+  end
+end
