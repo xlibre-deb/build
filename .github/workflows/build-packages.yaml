@@ -33,6 +33,7 @@ jobs:
   build:
     needs: generate_build_jobs
     strategy:
+      fail-fast: false
       matrix:
         include: ${{ fromJson(needs.generate_build_jobs.outputs.jobs) }}
 
