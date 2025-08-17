@@ -58,6 +58,7 @@ class Repos < Thor
   end
 
   desc 'update [REPOS]', 'Update repo metadata (default: update all repos)'
+  option :resign, type: :boolean, desc: 're-sign *.dsc files that are already signed'
   def update(*repos)
     require_commands! %w[debsign apt-ftparchive gpg xz]
 
@@ -72,7 +73,11 @@ class Repos < Thor
       dsc_files = Dir.glob("repos/#{name}/**/*.dsc")
       dsc_files.each do |path|
         puts "# Sign: #{path}"
-        run! %(debsign --re-sign -k #{kp} #{path} >/dev/null)
+        if options[:resign]
+          run! %(debsign --re-sign -k #{kp} #{path} >/dev/null)
+        else
+          run! %(debsign --no-re-sign -k #{kp} #{path} >/dev/null)
+        end
       end
 
       FileUtils.mkdir_p("repos/#{name}/dists")
