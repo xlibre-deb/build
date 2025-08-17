@@ -70,6 +70,8 @@ class Artifacts < Thor
 
   desc 'dl [RUN_ID]', 'Download build artifacts (default: from last successful run)'
   def dl(run_id = nil)
+    require_commands! %w(aria2c)
+
     token = options[:token] || ENV['GITHUB_TOKEN']
     token = nil if token.strip.empty?
     abort 'Token required' unless token

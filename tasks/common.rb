@@ -70,6 +70,10 @@ class String
       self[0...truncated_length] + '...'
     end
   end
+
+  def command?
+    system 'which', self, out: File::NULL, err: :out
+  end
 end
 
 class Config
@@ -115,4 +119,10 @@ def key_fingerprint
     return fp
   end
   raise 'No signing key found in misc/key.asc'
+end
+
+def require_commands!(*commands)
+  commands.flatten.each do |cmd|
+    abort "Command '#{cmd}' not found" unless cmd.to_s.command?
+  end
 end

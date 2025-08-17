@@ -7,6 +7,8 @@ class Build < Thor
 
   desc 'use-remote-builder NAME URL', 'Use remote builder instance'
   def use_remote_builder(name, url)
+    require_commands! %w(docker)
+
     run! %(docker buildx rm '#{name}' >/dev/null 2>&1 ||:)
     run! %(docker buildx create --name '#{name}' --driver=remote '#{url}')
     run! %(docker buildx use '#{name}')
@@ -20,6 +22,8 @@ class Build < Thor
   desc 'target TARGET', 'Build packages for a specific target'
   option :packages, type: :array, desc: 'packages to build (default: all)'
   def target(target)
+    require_commands! %w(docker)
+
     dist, codename, arch = target.split('-').map(&:to_sym)
     image = config.matrix[dist][:vars][:image]
     image = "#{image}:#{codename}"
@@ -44,6 +48,8 @@ class Build < Thor
   option :systemd, type: :boolean, desc: 'enable or disable systemd support'
   option :packages, type: :array, desc: 'packages to build (default: all)'
   def local
+    require_commands! %w(uscan debuild apt-get dpkg-architecture)
+
     systemd = options[:systemd]
     packages = options[:packages]&.join(' ') || '*'
 
@@ -84,6 +90,7 @@ class Build < Thor
 
   desc 'bake', 'Build using docker bake file'
   def bake
+    require_commands! %w(docker)
     run! %(docker buildx bake)
   end
 end
