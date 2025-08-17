@@ -71,7 +71,7 @@ class Artifacts < Thor
 
   class_option :token, desc: 'GitHub token (default: from $GITHUB_TOKEN)'
 
-  desc 'dl [RUN_ID]', 'Download build artifacts (default: from last successful run)'
+  desc 'dl [RUN_ID]', 'Download build artifacts (default: from last successful build workflow)'
   def dl(run_id = nil)
     require_commands! %w[aria2c]
 
@@ -87,12 +87,12 @@ class Artifacts < Thor
     text = HTTP[**headers].get("#{GITHUB_API_URL}/actions/runs").to_s
     result = JSON.parse(text, symbolize_names: true)
     if run_id.nil?
-      run = result[:workflow_runs].find { |run| run[:conclusion] == 'success' }
+      run = result[:workflow_runs].find { |run| run[:conclusion] == 'success' && run[:name] == BUILD_WORKFLOW }
       run_id = run[:id]
     else
       run = result[:workflow_runs].find { |run| run[:id] == run_id }
     end
-    abort 'No successful run found' if run.nil?
+    abort 'No workflow run found' if run.nil?
 
     puts "# Download from the run - id: #{run_id} / title: #{run[:display_title]}"
 
