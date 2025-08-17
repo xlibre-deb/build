@@ -74,6 +74,16 @@ class String
   def command?
     system 'which', self, out: File::NULL, err: :out
   end
+
+  # Mangles version string according to DEP-14.
+  def mangle
+    tr(':~', '%_').gsub(/\.(?=\.|$|lock$)/, '.#')
+  end
+
+  # Reverts DEP-14 mangled version back to original Debian version.
+  def demangle
+    tr('%_', ':~').gsub('#', '')
+  end
 end
 
 class Config

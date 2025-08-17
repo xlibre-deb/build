@@ -18,8 +18,8 @@ class Packages < Thor
     FileUtils.mkdir_p('packages')
     Dir.chdir('packages') do
       Parallel.each(packages) do |pkg|
-        version = config.packages[:packages][pkg].to_s.gsub(':', '_')
-        tag = "#{pkg}-#{version}"
+        version = config.packages[:packages][pkg].to_s.mangle
+        tag = "xlibre/#{version}"
         run! %(git clone '#{prefix}#{pkg}')
         next if options[:head]
         Dir.chdir(pkg.to_s) do
@@ -53,7 +53,7 @@ class Version < Thor
     opts.push('--since', options[:since]) if options[:since]
 
     each_pkg(packages) do |pkg|
-      tag_format = "#{pkg}-%(version)s"
+      tag_format = 'xlibre/%(version)s'
       puts "# Update the package version: #{pkg}"
       run! 'gbp', 'dch', '--git-author', *opts,
            '--debian-tag', tag_format, '--ignore-branch'
@@ -64,7 +64,7 @@ class Version < Thor
   def release(*packages)
     require_commands! %w[gbp]
     each_pkg(packages) do |pkg|
-      tag_format = "#{pkg}-%(version)s"
+      tag_format = 'xlibre/%(version)s'
       puts "# Release package: #{pkg}"
       run! 'gbp', 'dch', '--git-author',
            '--debian-tag', tag_format, '--ignore-branch',
