@@ -1,0 +1,35 @@
+name: code-quality
+
+on:
+  push:
+    branches: [ '**' ]
+  pull_request:
+    branches: [ '**' ]
+
+jobs:
+  check_code_quality:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.4'
+          bundler-cache: true
+
+      - name: Install requirements
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y shellcheck
+          gem install thor rubocop
+
+      - name: Install typos using cargo
+        uses: baptiste0928/cargo-install@v3
+        with:
+          crate: typos-cli
+
+      - name: Check code quality
+        run: |
+          thor quality:check
