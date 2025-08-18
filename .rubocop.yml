@@ -35,6 +35,8 @@ Style/NegatedIf:
   Enabled: false
 Style/RescueModifier:
   Enabled: false
+Style/SpecialGlobalVars:
+  Enabled: false
 Style/StderrPuts:
   Enabled: false
 Style/StringConcatenation:
