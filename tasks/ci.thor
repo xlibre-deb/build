@@ -32,7 +32,7 @@ class Runs < Thor
   option :name, desc: 'Filter by workflow name'
   def list
     token = options[:token] || ENV['GITHUB_TOKEN']
-    token = nil if token.strip.empty?
+    token = nil if token && token.strip.empty?
     headers = {
       accept: 'application/vnd.github+json',
       x_github_api_version: GITHUB_API_VERSION,
@@ -76,7 +76,7 @@ class Artifacts < Thor
     require_commands! %w[aria2c]
 
     token = options[:token] || ENV['GITHUB_TOKEN']
-    token = nil if token.strip.empty?
+    token = nil if token && token.strip.empty?
     abort 'Token required' unless token
     headers = {
       accept: 'application/vnd.github+json',
