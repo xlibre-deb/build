@@ -20,11 +20,11 @@ class Packages < Thor
     FileUtils.mkdir_p('packages')
     Dir.chdir('packages') do
       Parallel.each(packages) do |pkg|
-        version = config.packages[:packages][pkg].to_s.mangle
-        tag = "xlibre/#{version}"
         run! %(git clone '#{prefix}#{pkg}')
         next if head
         Dir.chdir(pkg.to_s) do
+          version = config.packages[:packages][pkg].to_s.mangle
+          tag = "xlibre/#{version}"
           run! %(git checkout '#{tag}')
         end
       end
@@ -46,25 +46,92 @@ class Version < Thor
 
   desc 'new [PACKAGES]', 'Add a new version to each package (default: all)'
   option :version, desc: 'new version (default: increase)'
+  option :urgency, desc: 'urgency level'
   option :release, type: :boolean, desc: 'finalize package changelogs for release'
   option :commit, type: :boolean, desc: 'commit package version changes'
+  option :tag, type: :boolean, desc: 'tag package releases'
   def new(*packages)
     require_commands! %w[gbp]
+    set_envs!
 
     opts = []
     opts.push('--new-version', options[:version]) if options[:version]
+    opts.push('--urgency', options[:urgency]) if options[:urgency]
     opts.push('--release') if options[:release]
     opts.push('--commit') if options[:commit]
 
     each_pkg(packages) do |pkg|
-      tag_format = 'xlibre/%(version)s'
       puts "# Update the package version: #{pkg}"
-      run! 'gbp', 'dch', '--git-author', *opts,
-           '--debian-tag', tag_format, '--ignore-branch'
+      run! 'gbp', 'dch', *opts,
+           '--debian-branch', 'xlibre/latest',
+           '--debian-tag', 'xlibre/%(version)s',
+           '--upstream-branch', 'upstream/latest',
+           '--upstream-tag', 'upstream/%(version)s'
+      next unless options[:tag]
+
+      tag_msg_format = 'Tag %(pkg)s %(version)s'
+      user_kp = user_signingkey
+      run! 'gbp', 'tag',
+           '--sign-tags',
+           '--keyid', user_kp,
+           '--debian-branch', 'xlibre/latest',
+           '--debian-tag', 'xlibre/%(version)s',
+           '--debian-tag-msg', tag_msg_format
+    end
+  end
+
+  desc 'tag [PACKAGES]', 'Tag package releases (default: all packages)'
+  def tag(*packages)
+    require_commands! %w[git gbp]
+
+    tag_msg_format = 'Tag %(pkg)s %(version)s'
+    user_kp = user_signingkey
+
+    each_pkg(packages) do |pkg|
+      puts "# Tag package version: #{pkg}"
+      run! 'gbp', 'tag',
+           '--sign-tags',
+           '--keyid', user_kp,
+           '--debian-branch', 'xlibre/latest',
+           '--debian-tag', 'xlibre/%(version)s',
+           '--debian-tag-msg', tag_msg_format
+    end
+  end
+
+  desc 'push [PACKAGES]', 'Push packages to remote Git repos (default: all packages)'
+  option :dry_run, type: :boolean
+  def push(*packages)
+    require_commands! %w[gbp]
+
+    opts = []
+    opts.push('--dry-run') if options[:dry_run]
+
+    each_pkg(packages) do |pkg|
+      puts "# Push #{pkg} to remote repo"
+      is_native = pkg == 'xlibre'
+      run! %(git checkout upstream/latest >/dev/null) unless is_native
+      run! %(git checkout xlibre/latest >/dev/null)
+      run! 'gbp', 'push', *opts,
+           '--debian-branch', 'xlibre/latest',
+           '--debian-tag', 'xlibre/%(version)s',
+           '--upstream-branch', 'upstream/latest',
+           '--upstream-tag', 'upstream/%(version)s',
+           '--pristine-tar'
     end
   end
 
   no_commands do
+    def set_envs!
+      name = %x(git config --local user.name)
+      name = %x(git config --global user.name) if $?.exitstatus != 0
+      raise 'Git user name not configured.' if $?.exitstatus != 0
+      email = %x(git config --local user.email)
+      email = %x(git config --global user.email) if $?.exitstatus != 0
+      raise 'Git user email not configured.' if $?.exitstatus != 0
+      ENV['DEBFULLNAME'] = name.strip
+      ENV['DEBEMAIL'] = email.strip
+    end
+
     def each_pkg(packages, &block)
       Dir.glob('packages/*/').each do |dir|
         pkg = File.basename(dir)

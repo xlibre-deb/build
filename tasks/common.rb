@@ -131,6 +131,13 @@ def key_fingerprint
   raise 'No signing key found in misc/key.asc'
 end
 
+def user_signingkey
+  key = %x(git config --local user.signingkey)
+  key = %x(git config --global user.signingkey) if $?.exitstatus != 0
+  raise 'Git user signingkey not configured.' if $?.exitstatus != 0
+  key.strip
+end
+
 def require_commands!(*commands)
   commands.flatten.each do |cmd|
     abort "Command '#{cmd}' not found" unless cmd.to_s.command?
