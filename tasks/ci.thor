@@ -90,7 +90,7 @@ class Artifacts < Thor
       run = result[:workflow_runs].find { |run| run[:conclusion] == 'success' && run[:name] == BUILD_WORKFLOW }
       run_id = run[:id]
     else
-      run = result[:workflow_runs].find { |run| run[:id] == run_id }
+      run = result[:workflow_runs].find { |run| run[:id].to_s == run_id }
     end
     abort 'No workflow run found' if run.nil?
 
