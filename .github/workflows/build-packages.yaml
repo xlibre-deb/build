@@ -70,8 +70,16 @@ jobs:
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
-        if: always()
+        if: success()
         with:
-          name: output-${{ env.TARGET }}
+          name: success-${{ env.TARGET }}
+          path: output/
+          include-hidden-files: true
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: failure-${{ env.TARGET }}
           path: output/
           include-hidden-files: true
