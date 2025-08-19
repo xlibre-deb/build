@@ -31,6 +31,9 @@ check_arch() {
   echo "$pkg_arch" | grep -qE " ($host_arch|any-$host_arch|any|all|linux-any) "
 }
 
+build "$BUILD_DIR/xorgproto"
+apt-get install -y "$BUILD_DIR"/x11proto*.deb
+
 build "$BUILD_DIR/xlibre"
 apt-get install -y "$BUILD_DIR"/xlibre-x11-common*.deb
 
