@@ -73,14 +73,8 @@ class Build < Thor
     end
 
     Dir.mkdir(abstmp)
+    run! %(SYSTEMD=systemd bash misc/docker/install-reqs.sh)
     run! %(cd packages && cp -r #{packages} ../tmp/)
-
-    install_pgks = %w[devscripts]
-    install_pgks.concat(%w[libdbus-1-dev libsystemd-dev systemd-dev]) if systemd
-    run! 'apt-get', 'update'
-    run! 'env', 'DEBIAN_FRONTEND=noninteractive',
-         'apt-get', 'install', '-y', '--no-install-recommends', *install_pgks
-
     run! 'env', "SYSTEMD=#{systemd}", 'bash', 'misc/docker/build.sh', abstmp
   end
 

@@ -3,11 +3,9 @@ ARG BASEIMAGE=debian:unstable
 FROM ${BASEIMAGE} AS base
 ARG SYSTEMD=true
 
-RUN apt-get update && \
-  DEBIAN_FRONTEND=noninteractive \
-  apt-get install -y --no-install-recommends \
-    devscripts \
-    $( [ ${SYSTEMD} = true ] && echo libdbus-1-dev libsystemd-dev systemd-dev ||: )
+WORKDIR /build
+COPY misc/docker/install-reqs.sh ./
+RUN SYSTEMD=${SYSTEMD} bash /build/install-reqs.sh
 
 FROM base AS build
 ARG PACKAGES=*
