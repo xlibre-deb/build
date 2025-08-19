@@ -53,6 +53,7 @@ devuan:
     aliases:
 ubuntu:
   codenames:
+  - noble
   - plucky
   suites:
   arch:
@@ -65,6 +66,6 @@ ubuntu:
     image: ubuntu
     released_only: true
     systemd: true
-    min_version: 25.04
+    min_version: 24.04
     exclude:
     aliases:
