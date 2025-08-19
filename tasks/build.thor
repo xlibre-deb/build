@@ -59,27 +59,16 @@ class Build < Thor
 
     systemd = options[:systemd]
     packages = options[:packages]&.join(' ') || '*'
-
-    if systemd.nil?
-      $stderr.puts 'Specify --systemd or --no-systemd'
-      exit 1
-    end
+    abort 'Specify --systemd or --no-systemd' if systemd.nil?
 
     abstmp = File.absolute_path('tmp')
     if File.exist?(abstmp)
-      unless File.directory?(abstmp)
-        $stderr.puts "'#{abstmp}' exists but is not a directory."
-        exit 1
-      end
+      abort "'#{abstmp}' exists but is not a directory." unless File.directory?(abstmp)
       if yes?("Directory '#{abstmp}' already exists. Delete it to proceed? (y/n)")
         FileUtils.rm_rf(abstmp, secure: true)
-        if File.exist?(abstmp)
-          $stderr.puts "Directory '#{abstmp}' could not be deleted. Possible permission issue."
-          exit 1
-        end
+        abort "Directory '#{abstmp}' could not be deleted. Permission issue?" if File.exist?(abstmp)
       else
-        $stderr.puts 'Stopped.'
-        exit 1
+        abort 'Stopped.'
       end
     end
 
