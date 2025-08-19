@@ -1,16 +1,15 @@
 debian:
   codenames:
-    - trixie
-    - forky
-    - sid
+  - trixie
+  - forky
   suites:
     oldstable:
     stable: trixie
     testing: forky
-    unstable: sid
+    unstable:
   arch:
-    - amd64
-    - arm64
+  - amd64
+  - arm64
   vars:
     repo: https://github.com/xlibre-deb/debian
     data_url: https://debian.pages.debian.net/distro-info-data/debian.csv
@@ -20,21 +19,26 @@ debian:
     systemd: true
     min_version: 13
     exclude:
-      - experimental
+    - experimental
+    - sid
     aliases:
+    - old: testing
+      new:
+        codename: sid
+        suite: unstable
 devuan:
   disabled: true
   codenames:
-    - excalibur
-    - freia
-    - ceres
+  - excalibur
+  - freia
+  - ceres
   suites:
     oldstable:
     stable:
     testing: excalibur
     unstable: ceres
   arch:
-    - amd64
+  - amd64
   vars:
     repo: https://github.com/xlibre-deb/devuan
     data_url: https://git.devuan.org/devuan/distro-info-data/raw/branch/suites/unstable/devuan.csv
@@ -44,15 +48,15 @@ devuan:
     systemd: false
     min_version: 6
     exclude:
-      - experimental
+    - experimental
     aliases:
 ubuntu:
   codenames:
-    - plucky
+  - plucky
   suites:
   arch:
-    - amd64
-    - arm64
+  - amd64
+  - arm64
   vars:
     repo: https://github.com/xlibre-deb/ubuntu
     data_url: https://debian.pages.debian.net/distro-info-data/ubuntu.csv
