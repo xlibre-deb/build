@@ -67,8 +67,10 @@ class Repos < Thor
 
     repos.each do |name|
       data = config.matrix[name.to_sym]
-      codenames = data[:codenames]
+      codenames = data[:codenames].dup
+      suites = data[:suites].dup
       arch_list = data[:arch]
+      alias_codenames = []
 
       dsc_files = Dir.glob("repos/#{name}/**/*.dsc")
       dsc_files.each do |path|
@@ -86,21 +88,43 @@ class Repos < Thor
           FileUtils.remove_file(suite.to_s) if File.symlink?(suite.to_s)
           File.symlink(release.to_s, suite.to_s) unless release.nil?
         end
+        data[:vars][:aliases]&.each do |a|
+          old = a[:old]
+          new_codename = a[:new][:codename]
+          new_suite = a[:new][:suite]
+          FileUtils.remove_file(new_suite) if !new_suite.nil? && File.symlink?(new_suite)
+          next if new_codename == new_suite
+          File.symlink(new_codename, new_suite) unless new_suite.nil?
+
+          FileUtils.mkdir_p(new_codename)
+          FileUtils.remove_file("#{new_codename}/main", force: true)
+          File.symlink("../#{old}/main", "#{new_codename}/main")
+          FileUtils.remove_file("#{new_codename}/pool", force: true)
+          File.symlink("../#{old}/pool", "#{new_codename}/pool")
+
+          codenames.append(new_codename)
+          alias_codenames.append(new_codename)
+          suites[new_suite.to_sym] = new_codename unless new_suite.nil?
+        end
       end
 
       Dir.chdir("repos/#{name}") do
         codenames.each do |release|
-          Apt.sources(release)
-          Apt.sources_xz(release)
+          is_alias = alias_codenames.include?(release)
 
-          arch_list.each do |arch|
-            Apt.packages(release, arch)
-            Apt.packages_xz(release, arch)
-            Apt.contents(release, arch)
-            Apt.contents_xz(release, arch)
+          unless is_alias
+            Apt.sources(release)
+            Apt.sources_xz(release)
+
+            arch_list.each do |arch|
+              Apt.packages(release, arch)
+              Apt.packages_xz(release, arch)
+              Apt.contents(release, arch)
+              Apt.contents_xz(release, arch)
+            end
           end
 
-          suite = data[:suites]&.key(release)
+          suite = suites&.key(release)
           allarch = (['source'] + arch_list).join(' ')
           Apt.release(release, suite, allarch)
           Apt.release_gpg(release, kp)

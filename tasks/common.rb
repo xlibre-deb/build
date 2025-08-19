@@ -26,15 +26,18 @@ module MatrixData
 
   def to_yaml
     yaml = stringify(self).to_yaml
-    yaml = yaml.gsub(/\A---\s*\n/, '') # remove header
-    yaml.gsub(/^( *)-/, '\1  -') # indent array
+    yaml.gsub(/\A---\s*\n/, '') # remove header
   end
 
   private
 
-  def stringify(hash)
-    hash.to_h do |k, v|
-      [k.to_s, v.is_a?(Hash) ? stringify(v) : v]
+  def stringify(obj)
+    if obj.is_a?(Hash)
+      obj.to_h { |k, v| [k.to_s, stringify(v)] }
+    elsif obj.is_a?(Array)
+      obj.map { |v| stringify(v) }
+    else
+      obj
     end
   end
 end

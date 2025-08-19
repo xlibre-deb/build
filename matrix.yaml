@@ -21,6 +21,7 @@ debian:
     min_version: 13
     exclude:
       - experimental
+    aliases:
 devuan:
   disabled: true
   codenames:
@@ -44,6 +45,7 @@ devuan:
     min_version: 6
     exclude:
       - experimental
+    aliases:
 ubuntu:
   codenames:
     - plucky
@@ -60,3 +62,4 @@ ubuntu:
     systemd: true
     min_version: 25.04
     exclude:
+    aliases:
