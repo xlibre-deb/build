@@ -2,9 +2,11 @@ require 'bundler/inline'
 gemfile do
   source 'https://rubygems.org'
   gem 'parallel'
+  gem 'terminal-table'
 end
 
 require 'parallel'
+require 'terminal-table'
 require 'fileutils'
 require_relative 'common'
 
@@ -130,6 +132,39 @@ class Repos < Thor
           Apt.release_gpg(release, kp)
           Apt.inrelease(release, kp)
         end
+      end
+    end
+  end
+
+  desc 'update-readme [REPOS]', 'Update repository READMEs (default: all)'
+  def update_readme(*repos)
+    repos = config.matrix.without_disabled.keys if repos.empty?
+    ptn = /^(#+ *Support Status).*\z/im
+    repos.each do |repo|
+      releases = config.matrix.all_releases(repo.to_sym)
+
+      Dir.chdir("repos/#{repo}") do
+        readme = File.read('README.md')
+        if ptn.match?(readme)
+          readme = readme.sub(ptn, "\\1\n\n")
+        else
+          readme += "\n\n## Support Status\n\n"
+        end
+
+        table = ::Terminal::Table.new do |t|
+          releases.each do |r|
+            relname = r[:codename]
+            relname = "#{relname} (#{r[:suite]})" if r[:suite]
+            arch = r[:alias_of] ? '' : config.matrix[repo.to_sym][:arch].join(', ')
+            status = r[:alias_of] ? "Alias of #{r[:alias_of]}" : '✅'
+            t << [relname, status, arch]
+          end
+        end
+        table.headings = %w[Release Status Arch]
+        table.style = { border: :markdown }
+
+        readme += "#{table}\n"
+        File.write('README.md', readme)
       end
     end
   end

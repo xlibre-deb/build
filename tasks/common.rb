@@ -12,6 +12,22 @@ module MatrixData
     reject { |_k, v| v[:disabled] == true }.extend(MatrixData)
   end
 
+  def all_releases(dist)
+    data = self[dist]
+    releases = []
+    data[:codenames].each do |codename|
+      suite = data[:suites]&.key(codename)
+      releases.append({ codename: codename, suite: suite })
+    end
+    data[:vars][:aliases]&.each do |a|
+      old = a[:old]
+      codename = a[:new][:codename]
+      suite = a[:new][:suite]
+      releases.append({ codename: codename, suite: suite, alias_of: old })
+    end
+    releases
+  end
+
   def targets
     flat_map do |dist, body|
       body[:codenames].product(body[:arch]).map do |codename, arch|
