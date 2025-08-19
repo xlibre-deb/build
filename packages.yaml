@@ -5,7 +5,7 @@ packages:
   xlibre-server: 2:25.0.0.8-3
   xserver-xlibre-input-elographics: 1:1.4.4.1-2
   xserver-xlibre-input-evdev: 1:2.11.0.1-2
-  xserver-xlibre-input-libinput: 1.5.0.1-2
+  xserver-xlibre-input-libinput: 1.5.0.1-3
   xserver-xlibre-input-synaptics: 1.10.0.1-2
   xserver-xlibre-input-vmmouse: 1:13.2.0.1-2
   xserver-xlibre-input-void: 1:1.4.2.1-2
