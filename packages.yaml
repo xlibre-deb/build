@@ -1,7 +1,7 @@
 prefix: https://github.com/xlibre-deb/
 head: false
 packages:
-  xlibre: 1:7.8+2
+  xlibre: 1:7.8+3
   xlibre-server: 2:25.0.0.8-3
   xserver-xlibre-input-elographics: 1:1.4.4.1-2
   xserver-xlibre-input-evdev: 1:2.11.0.1-2
