@@ -34,10 +34,11 @@ class Repos < Thor
       puts "# Include: #{path}"
 
       target = File.basename(File.dirname(path))
-      distro, codename, arch = target.split('-')
+      distro, codename, _arch = target.split('-')
+      deb_arch = File.basename(path)[/_([A-Za-z0-9\-]+).deb$/, 1]
 
-      FileUtils.mkdir_p("repos/#{distro}/dists/#{codename}/pool/main/#{arch}")
-      FileUtils.cp(path, "repos/#{distro}/dists/#{codename}/pool/main/#{arch}/")
+      FileUtils.mkdir_p("repos/#{distro}/dists/#{codename}/pool/main/#{deb_arch}")
+      FileUtils.cp(path, "repos/#{distro}/dists/#{codename}/pool/main/#{deb_arch}/")
     end
 
     source_files = Dir.glob('output/*/*.{debian.tar.*,dsc,orig.tar.*}')
@@ -117,6 +118,11 @@ class Repos < Thor
           unless is_alias
             Apt.sources(release)
             Apt.sources_xz(release)
+
+            Apt.packages(release, 'all')
+            Apt.packages_xz(release, 'all')
+            Apt.contents(release, 'all')
+            Apt.contents_xz(release, 'all')
 
             arch_list.each do |arch|
               Apt.packages(release, arch)
