@@ -121,6 +121,24 @@ class Version < Thor
     end
   end
 
+  desc 'import-upstream [PACKAGES]', 'Import upstream source (default: all packages)'
+  def import_upstream(*packages)
+    require_commands! %w[gbp git]
+    user_kp = user_signingkey
+
+    each_pkg(packages) do |pkg|
+      puts "# Import upstream source: #{pkg}"
+      run! 'gbp', 'import-orig',
+           '--uscan',
+           '--pristine-tar',
+           '--sign-tags',
+           '--keyid', user_kp,
+           '--debian-branch', 'xlibre/latest',
+           '--upstream-branch', 'upstream/latest',
+           '--upstream-tag', 'upstream/%(version)s'
+    end
+  end
+
   no_commands do
     def set_envs!
       name = %x(git config --local user.name)
