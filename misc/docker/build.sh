@@ -19,7 +19,8 @@ build() {
   fi
   echo "## Build $path ##"
   apt-get build-dep -y .
-  if [ "$path" != "$BUILD_DIR/xlibre" ]; then
+  # skip if native package
+  if ! [ -f debian/source/format ] || ! grep -q 'native' debian/source/format; then
     uscan --download-current-version
   fi
   debuild -us -uc

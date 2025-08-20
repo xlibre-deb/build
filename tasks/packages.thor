@@ -108,7 +108,8 @@ class Version < Thor
 
     each_pkg(packages) do |pkg|
       puts "# Push #{pkg} to remote repo"
-      is_native = pkg == 'xlibre'
+      format_file = 'debian/source/format'
+      is_native = File.file?(format_file) && File.read(format_file).include?('native')
       run! %(git checkout upstream/latest >/dev/null) unless is_native
       run! %(git checkout xlibre/latest >/dev/null)
       run! 'gbp', 'push', *opts,
