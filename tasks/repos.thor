@@ -197,7 +197,7 @@ module Apt
     FileUtils.mkdir_p("dists/#{release}/pool/main")
     FileUtils.mkdir_p("dists/#{release}/main/binary-#{arch}")
     run! %(
-      apt-ftparchive packages dists/#{release}/pool/main/ \
+      apt-ftparchive packages -a #{arch} dists/#{release}/pool/main/ \
         > dists/#{release}/main/binary-#{arch}/Packages
     )
   end
@@ -211,7 +211,7 @@ module Apt
 
   def self.contents(release, arch)
     run! %(
-      apt-ftparchive contents -a #{arch} dists/#{release}/ \
+      apt-ftparchive contents -a #{arch} dists/#{release}/pool/main/ \
         > dists/#{release}/main/Contents-#{arch}
     )
   end
