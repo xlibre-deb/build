@@ -35,7 +35,7 @@ class Repos < Thor
 
       target = File.basename(File.dirname(path))
       distro, codename, _arch = target.split('-')
-      deb_arch = File.basename(path)[/_([A-Za-z0-9\-]+).deb$/, 1]
+      deb_arch = File.basename(path)[/_([A-Za-z0-9-]+).deb$/, 1]
 
       FileUtils.mkdir_p("repos/#{distro}/dists/#{codename}/pool/main/#{deb_arch}")
       FileUtils.cp(path, "repos/#{distro}/dists/#{codename}/pool/main/#{deb_arch}/")
