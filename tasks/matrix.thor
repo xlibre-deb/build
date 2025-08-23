@@ -21,6 +21,11 @@ class Matrix < Thor
       releases = fetch_supported_releases(dist)
       body[:codenames] = releases.map { |row| row[:codename] }
       body[:suites] = fetch_suites(dist, releases)
+
+      suite_required = config.matrix[dist][:vars][:suite_required]
+      if suite_required
+        body[:codenames].filter! { |codename| body[:suites].value?(codename) }
+      end
     end
     yaml = config.matrix.to_yaml
 

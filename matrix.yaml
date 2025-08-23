@@ -17,6 +17,7 @@ debian:
     release_url: https://deb.debian.org/debian/dists/%{release}/Release
     image: debian
     released_only: false
+    suite_required: true
     systemd: true
     min_version: 12
     exclude:
@@ -46,6 +47,7 @@ devuan:
     release_url: http://deb.devuan.org/merged/dists/%{release}/Release
     image: devuan/devuan
     released_only: false
+    suite_required: true
     systemd: false
     min_version: 6
     exclude:
@@ -65,6 +67,7 @@ ubuntu:
     release_url: https://archive.ubuntu.com/ubuntu/dists/%{release}/Release
     image: ubuntu
     released_only: true
+    suite_required: false
     systemd: true
     min_version: 24.04
     exclude:
