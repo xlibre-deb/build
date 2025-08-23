@@ -25,6 +25,23 @@ EOF
   apt-get install -y --no-install-recommends \
     devscripts
   exit 0
+elif [ "$CODENAME" == daedalus ]; then
+  rm -f /etc/apt/sources.list
+  mkdir -p /etc/apt/sources.list.d/
+  cat <<EOF > /etc/apt/sources.list.d/devuan.sources
+Types: deb
+URIs: http://deb.devuan.org/merged
+Suites: daedalus daedalus-security daedalus-updates daedalus-backports
+Components: main
+Signed-By: /usr/share/keyrings/devuan-archive-keyring.gpg
+EOF
+
+  apt-get update
+  apt-get install -y --no-install-recommends -t daedalus-backports \
+    libdrm-dev
+  apt-get install -y --no-install-recommends \
+    devscripts
+  exit 0
 fi
 
 if [ "${SYSTEMD}" = true ]; then
