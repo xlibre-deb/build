@@ -29,16 +29,14 @@ debian:
         codename: sid
         suite: unstable
 devuan:
-  disabled: true
   codenames:
+  - daedalus
   - excalibur
-  - freia
-  - ceres
   suites:
     oldstable:
-    stable:
+    stable: daedalus
     testing: excalibur
-    unstable: ceres
+    unstable:
   arch:
   - amd64
   vars:
@@ -49,10 +47,15 @@ devuan:
     released_only: false
     suite_required: true
     systemd: false
-    min_version: 6
+    min_version: 5
     exclude:
     - experimental
+    - ceres
     aliases:
+    - old: testing
+      new:
+        codename: ceres
+        suite: unstable
 ubuntu:
   codenames:
   - noble
