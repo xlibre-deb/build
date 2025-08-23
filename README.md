@@ -3,8 +3,8 @@
 ## Repositories
 
 - Debian: https://github.com/xlibre-deb/debian
+- Devuan: https://github.com/xlibre-deb/devuan
 - Ubuntu: https://github.com/xlibre-deb/ubuntu
-- (TODO) Devuan: https://github.com/xlibre-deb/devuan
 
 ## Directory structure
 
