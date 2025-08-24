@@ -16,11 +16,12 @@ class Repos < Thor
   def clone(*repos)
     require_commands! %w[git]
 
-    repos = config.matrix.without_disabled.keys if repos.empty?
+    matrix = config.matrix
+    repos = matrix.without_disabled.keys if repos.empty?
     FileUtils.mkdir_p('repos')
     Dir.chdir('repos') do
       Parallel.each(repos) do |name|
-        repo_url = config.matrix[name.to_sym][:vars][:repo]
+        repo_url = matrix[name.to_sym][:vars][:repo]
         repo_url = "#{repo_url}-test" if options[:test]
         run! %(git clone #{repo_url} #{name})
       end
