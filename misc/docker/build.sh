@@ -4,8 +4,8 @@ set -e
 export BUILD_DIR="$1"
 export DEBIAN_FRONTEND=noninteractive
 export DEB_BUILD_OPTIONS=nocheck
-if [ "$SYSTEMD" = true ]; then
-  export DEB_BUILD_OPTIONS="systemd $DEB_BUILD_OPTIONS"
+if [ "$SYSTEMD" != true ]; then
+  export DEB_BUILD_PROFILES=nosystemd
 fi
 
 build() {

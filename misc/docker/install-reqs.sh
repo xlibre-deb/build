@@ -44,10 +44,6 @@ EOF
   exit 0
 fi
 
-if [ "${SYSTEMD}" = true ]; then
-  apt_add_pkgs="libdbus-1-dev libsystemd-dev systemd-dev"
-fi
-
 apt-get update
 apt-get install -y --no-install-recommends \
-  devscripts $apt_add_pkgs
+  devscripts
