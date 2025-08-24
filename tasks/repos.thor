@@ -28,17 +28,30 @@ class Repos < Thor
   end
 
   desc 'include', 'Include built packages in repos'
+  option :force, type: :boolean, desc: 'overwrite existing files'
   def include
     deb_files = Dir.glob('output/*/*.deb')
     deb_files.each do |path|
-      puts "# Include: #{path}"
-
       target = File.basename(File.dirname(path))
       distro, codename, _arch = target.split('-')
-      deb_arch = File.basename(path)[/_([A-Za-z0-9-]+).deb$/, 1]
+      basename = File.basename(path)
+      deb_arch = basename[/_([A-Za-z0-9-]+).deb$/, 1]
+      destdir = "repos/#{distro}/dists/#{codename}/pool/main/#{deb_arch}"
+      dest = "#{destdir}/#{basename}"
 
-      FileUtils.mkdir_p("repos/#{distro}/dists/#{codename}/pool/main/#{deb_arch}")
-      FileUtils.cp(path, "repos/#{distro}/dists/#{codename}/pool/main/#{deb_arch}/")
+      if File.exist?(dest) && !File.file?(dest)
+        abort "# ERROR: #{dest} exists and is not a file"
+      elsif File.file?(dest) && !options[:force]
+        puts "# Skip: #{path} -> #{dest} (already exists)"
+      else
+        if File.file?(dest)
+          puts "# Overwrite: #{path} -> #{dest}"
+        else
+          puts "# Include: #{path} -> #{dest}"
+        end
+        FileUtils.mkdir_p(destdir)
+        FileUtils.cp(path, dest)
+      end
     end
 
     source_files = Dir.glob('output/*/*.{debian.tar.*,dsc,orig.tar.*}')
@@ -51,12 +64,25 @@ class Repos < Thor
         end
       end
 
-      puts "# Include: #{path}"
       target = File.basename(File.dirname(path))
       distro, codename, = target.split('-')
+      basename = File.basename(path)
+      destdir = "repos/#{distro}/dists/#{codename}/pool/main/source"
+      dest = "#{destdir}/#{basename}"
 
-      FileUtils.mkdir_p("repos/#{distro}/dists/#{codename}/pool/main/source")
-      FileUtils.cp(path, "repos/#{distro}/dists/#{codename}/pool/main/source/")
+      if File.exist?(dest) && !File.file?(dest)
+        abort "# ERROR: #{dest} exists and is not a file"
+      elsif File.file?(dest) && !options[:force]
+        puts "# Skip: #{path} -> #{dest} (already exists)"
+      else
+        if File.file?(dest)
+          puts "# Overwrite: #{path} -> #{dest}"
+        else
+          puts "# Include: #{path} -> #{dest}"
+        end
+        FileUtils.mkdir_p(destdir)
+        FileUtils.cp(path, dest)
+      end
     end
   end
 
