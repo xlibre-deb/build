@@ -201,6 +201,43 @@ class Repos < Thor
       end
     end
   end
+
+  desc 'list-pkgs REPO', 'List packages in the repo'
+  def list_pkgs(repo)
+    list = RepoPkgs.list(repo)
+    puts list.to_yaml
+  end
+
+  desc 'rm-old-pkgs REPO', 'Remove old packages from the repo'
+  def rm_old_pkgs(repo)
+    list = RepoPkgs.list(repo)
+    list['binary'].each do |pkg, versions|
+      vers = versions.drop(1)
+      next if vers.empty?
+      puts "# Delete #{pkg}: #{vers.join(', ')}"
+      vers.each do |ver|
+        FileUtils.rm Dir.glob("repos/#{repo}/**/#{pkg}_#{ver}_*.deb")
+      end
+    end
+
+    list['source'].each do |pkg, versions|
+      vers = versions.drop(1)
+      next if vers.empty?
+      puts "# Delete #{pkg}: #{vers.join(', ')}"
+      vers.each do |ver|
+        FileUtils.rm Dir.glob("repos/#{repo}/**/#{pkg}_#{ver}.dsc")
+        FileUtils.rm Dir.glob("repos/#{repo}/**/#{pkg}_#{ver}.debian.tar.*")
+      end
+    end
+
+    Dir.glob("repos/#{repo}/**/*.orig.tar.*").each do |path|
+      name, version = File.basename(path, '.*').split('_')
+      pkg_files = Dir.glob("repos/#{repo}/**/#{name}_*#{version}*.{dsc,debian.tar.*}")
+      next if pkg_files.empty?
+      FileUtils.rm pkg_files
+      FileUtils.rm_f [path] + Dir.glob("#{path}.asc")
+    end
+  end
 end
 
 module Apt
@@ -276,5 +313,28 @@ module Apt
         | gpg --local-user #{key_fingerprint} -qabs --clearsign \
         > dists/#{release}/InRelease
     )
+  end
+end
+
+module RepoPkgs
+  def self.list(repo)
+    result = {}
+    dists = Dir.children("repos/#{repo}/dists/").select do |e|
+      path = "repos/#{repo}/dists/#{e}"
+      File.directory?(path) && !File.symlink?(path)
+    end
+    dists.each do |dist|
+      files = Dir.glob("repos/#{repo}/dists/#{dist}/**/*.{deb,dsc}")
+      files.each do |path|
+        name, version, arch = File.basename(path, '.*').split('_')
+        arch ||= 'source'
+        bin_or_src = arch == 'source' ? 'source' : 'binary'
+        result[bin_or_src] ||= {}
+        result[bin_or_src][name] ||= []
+        result[bin_or_src][name].append(version) unless result[bin_or_src][name].include?(version)
+        result[bin_or_src][name].sort!.reverse!
+      end
+    end
+    result
   end
 end
