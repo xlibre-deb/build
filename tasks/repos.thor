@@ -230,11 +230,10 @@ class Repos < Thor
       end
     end
 
-    Dir.glob("repos/#{repo}/**/*.orig.tar.*").each do |path|
-      name, version = File.basename(path, '.*').split('_')
+    Dir.glob("repos/#{repo}/**/*.orig.tar.{gz,xz}").each do |path|
+      name, version = File.basename(path, '.*').delete_suffix('.orig.tar').split('_')
       pkg_files = Dir.glob("repos/#{repo}/**/#{name}_*#{version}*.{dsc,debian.tar.*}")
-      next if pkg_files.empty?
-      FileUtils.rm pkg_files
+      next unless pkg_files.empty?
       FileUtils.rm_f [path] + Dir.glob("#{path}.asc")
     end
   end
