@@ -19,11 +19,17 @@ build() {
   fi
   echo "## Build $path ##"
   apt-get build-dep -y .
-  # skip if native package
+
+  # unless native package
   if ! [ -f debian/source/format ] || ! grep -q 'native' debian/source/format; then
-    uscan --download-current-version
+    git branch pristine-tar origin/pristine-tar >/dev/null 2>&1 ||:
   fi
-  debuild -us -uc
+
+  gbp buildpackage -uc -us \
+    --git-pristine-tar \
+    --git-ignore-branch \
+    --git-upstream-branch=upstream/latest \
+    --git-debian-branch=xlibre/latest
 }
 
 check_arch() {

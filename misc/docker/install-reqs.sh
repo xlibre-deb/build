@@ -23,7 +23,7 @@ EOF
   apt-get install -y --no-install-recommends -t bookworm-backports \
     libdrm-dev libudev-dev libdbus-1-dev libsystemd-dev systemd-dev
   apt-get install -y --no-install-recommends \
-    devscripts
+    git-buildpackage pristine-tar
   exit 0
 elif [ "$CODENAME" == daedalus ]; then
   rm -f /etc/apt/sources.list
@@ -40,10 +40,10 @@ EOF
   apt-get install -y --no-install-recommends -t daedalus-backports \
     libdrm-dev
   apt-get install -y --no-install-recommends \
-    devscripts
+    git-buildpackage pristine-tar
   exit 0
 fi
 
 apt-get update
 apt-get install -y --no-install-recommends \
-  devscripts
+  git-buildpackage pristine-tar
