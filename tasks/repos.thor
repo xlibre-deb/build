@@ -3,10 +3,12 @@ gemfile do
   source 'https://rubygems.org'
   gem 'parallel'
   gem 'terminal-table'
+  gem 'deb_version'
 end
 
 require 'parallel'
 require 'terminal-table'
+require 'deb_version'
 require 'fileutils'
 require_relative 'common'
 
@@ -331,7 +333,7 @@ module RepoPkgs
         result[bin_or_src] ||= {}
         result[bin_or_src][name] ||= []
         result[bin_or_src][name].append(version) unless result[bin_or_src][name].include?(version)
-        result[bin_or_src][name].sort!.reverse!
+        result[bin_or_src][name].sort_by! { |v| DebVersion.new(v) }.reverse!
       end
     end
     result
