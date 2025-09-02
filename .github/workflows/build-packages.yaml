@@ -2,7 +2,7 @@ name: build-packages
 
 on:
   push:
-    branches: [ 'build/**' ]
+    branches: [ '**' ]
   workflow_dispatch:
 
 jobs:
