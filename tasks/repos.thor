@@ -210,33 +210,36 @@ class Repos < Thor
     puts list.to_yaml
   end
 
-  desc 'rm-old-pkgs REPO', 'Remove old packages from the repo'
-  def rm_old_pkgs(repo)
-    list = RepoPkgs.list(repo)
-    list['binary'].each do |pkg, versions|
-      vers = versions.drop(1)
-      next if vers.empty?
-      puts "# Delete #{pkg}: #{vers.join(', ')}"
-      vers.each do |ver|
-        FileUtils.rm Dir.glob("repos/#{repo}/**/#{pkg}_#{ver}_*.deb")
+  desc 'rm-old-pkgs [REPOS]', 'Remove old packages from the repo'
+  def rm_old_pkgs(*repos)
+    repos = config.matrix.without_disabled.keys if repos.empty?
+    repos.each do |repo|
+      list = RepoPkgs.list(repo)
+      list['binary'].each do |pkg, versions|
+        vers = versions.drop(1)
+        next if vers.empty?
+        puts "# Delete #{pkg}: #{vers.join(', ')}"
+        vers.each do |ver|
+          FileUtils.rm Dir.glob("repos/#{repo}/**/#{pkg}_#{ver}_*.deb")
+        end
       end
-    end
 
-    list['source'].each do |pkg, versions|
-      vers = versions.drop(1)
-      next if vers.empty?
-      puts "# Delete #{pkg}: #{vers.join(', ')}"
-      vers.each do |ver|
-        FileUtils.rm Dir.glob("repos/#{repo}/**/#{pkg}_#{ver}.dsc")
-        FileUtils.rm Dir.glob("repos/#{repo}/**/#{pkg}_#{ver}.debian.tar.*")
+      list['source'].each do |pkg, versions|
+        vers = versions.drop(1)
+        next if vers.empty?
+        puts "# Delete #{pkg}: #{vers.join(', ')}"
+        vers.each do |ver|
+          FileUtils.rm Dir.glob("repos/#{repo}/**/#{pkg}_#{ver}.dsc")
+          FileUtils.rm Dir.glob("repos/#{repo}/**/#{pkg}_#{ver}.debian.tar.*")
+        end
       end
-    end
 
-    Dir.glob("repos/#{repo}/**/*.orig.tar.{gz,xz}").each do |path|
-      name, version = File.basename(path, '.*').delete_suffix('.orig.tar').split('_')
-      pkg_files = Dir.glob("repos/#{repo}/**/#{name}_*#{version}*.{dsc,debian.tar.*}")
-      next unless pkg_files.empty?
-      FileUtils.rm_f [path] + Dir.glob("#{path}.asc")
+      Dir.glob("repos/#{repo}/**/*.orig.tar.{gz,xz}").each do |path|
+        name, version = File.basename(path, '.*').delete_suffix('.orig.tar').split('_')
+        pkg_files = Dir.glob("repos/#{repo}/**/#{name}_*#{version}*.{dsc,debian.tar.*}")
+        next unless pkg_files.empty?
+        FileUtils.rm_f [path] + Dir.glob("#{path}.asc")
+      end
     end
   end
 end
