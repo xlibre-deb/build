@@ -38,9 +38,6 @@ check_arch() {
   echo "$pkg_arch" | grep -qE " ($host_arch|any-$host_arch|any|all|linux-any) "
 }
 
-build "$BUILD_DIR/xorg-abi-dummy"
-apt-get install -y "$BUILD_DIR"/xorg-video-abi*.deb
-
 build "$BUILD_DIR/xorgproto"
 apt-get install -y "$BUILD_DIR"/x11proto*.deb
 
