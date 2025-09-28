@@ -133,6 +133,8 @@ class Version < Thor
         puts "# Skip (native): #{pkg}"
         next
       end
+      run! %(git checkout upstream/latest >/dev/null)
+      run! %(git checkout xlibre/latest >/dev/null)
       puts "# Import upstream source: #{pkg}"
       run! 'gbp', 'import-orig',
            '--uscan',
