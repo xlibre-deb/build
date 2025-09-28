@@ -127,6 +127,12 @@ class Version < Thor
     user_kp = user_signingkey
 
     each_pkg(packages) do |pkg|
+      format_file = 'debian/source/format'
+      is_native = File.file?(format_file) && File.read(format_file).include?('native')
+      if is_native
+        puts "# Skip (native): #{pkg}"
+        next
+      end
       puts "# Import upstream source: #{pkg}"
       run! 'gbp', 'import-orig',
            '--uscan',
