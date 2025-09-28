@@ -51,7 +51,7 @@ class Version < Thor
   option :commit, type: :boolean, desc: 'commit package version changes'
   option :tag, type: :boolean, desc: 'tag package releases'
   def new(*packages)
-    require_commands! %w[gbp]
+    require_commands! %w[gbp git]
     set_envs!
 
     opts = []
@@ -61,6 +61,12 @@ class Version < Thor
     opts.push('--commit') if options[:commit]
 
     each_pkg(packages) do |pkg|
+      head_tags = %x(git tag --points-at HEAD)
+      if head_tags.include?('xlibre/')
+        puts "Skip (already tagged): #{pkg}"
+        next
+      end
+
       puts "# Update the package version: #{pkg}"
       run! 'gbp', 'dch', *opts,
            '--debian-branch', 'xlibre/latest',
