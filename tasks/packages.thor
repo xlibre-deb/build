@@ -123,7 +123,7 @@ class Version < Thor
 
   desc 'import-upstream [PACKAGES]', 'Import upstream source (default: all packages)'
   def import_upstream(*packages)
-    require_commands! %w[gbp git]
+    require_commands! %w[gbp git uscan]
     user_kp = user_signingkey
 
     each_pkg(packages) do |pkg|
@@ -131,6 +131,11 @@ class Version < Thor
       is_native = File.file?(format_file) && File.read(format_file).include?('native')
       if is_native
         puts "# Skip (native): #{pkg}"
+        next
+      end
+      version_status = %x(uscan --report-status --no-download)
+      if version_status.include?('Package is up to date')
+        puts "# Skip (up-to-date): #{pkg}"
         next
       end
       run! %(git checkout upstream/latest >/dev/null)
