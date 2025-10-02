@@ -39,7 +39,7 @@ Untracked:
 
 2. Clone package source repositories.
   ```
-  thor packages:clone
+  thor pkg:clone
   ls packages/
   ```
 

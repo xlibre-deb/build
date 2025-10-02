@@ -7,7 +7,7 @@ end
 require 'parallel'
 require_relative 'common'
 
-class Packages < Thor
+class Pkg < Thor
   desc 'clone [PACKAGES]', 'Clone packages into packages/ directory (default: clone all)'
   option :head, type: :boolean
   def clone(*packages)
@@ -30,29 +30,32 @@ class Packages < Thor
       end
     end
   end
-end
 
-class Version < Thor
-  namespace 'packages:version'
-
-  desc 'get [PACKAGES]', 'Show package versions (default: all)'
-  def get(*packages)
+  desc 'get-version [PACKAGES]', 'Show package versions (default: package in current directory)'
+  option :all, type: :boolean, desc: 'Run on all packages'
+  def get_version(*packages)
     require_commands! %w[dpkg-parsechangelog]
+    packages = [ File.basename($current_dir) ] if packages.empty?
+    packages = [] if options[:all]
     each_pkg(packages) do |pkg|
       version = %x(dpkg-parsechangelog --show-field Version)
       puts "#{pkg}: #{version}"
     end
   end
 
-  desc 'new [PACKAGES]', 'Add a new version to each package (default: all)'
+  desc 'new-version [PACKAGES]', 'Add a new version to each package (default: package in current directory)'
+  option :all, type: :boolean, desc: 'Run on all packages'
   option :version, desc: 'new version (default: increase)'
   option :urgency, desc: 'urgency level'
   option :release, type: :boolean, desc: 'finalize package changelogs for release'
   option :commit, type: :boolean, desc: 'commit package version changes'
   option :tag, type: :boolean, desc: 'tag package releases'
-  def new(*packages)
+  def new_version(*packages)
     require_commands! %w[gbp git]
     set_envs!
+
+    packages = [ File.basename($current_dir) ] if packages.empty?
+    packages = [] if options[:all]
 
     opts = []
     opts.push('--new-version', options[:version]) if options[:version]
@@ -86,9 +89,13 @@ class Version < Thor
     end
   end
 
-  desc 'tag [PACKAGES]', 'Tag package releases (default: all packages)'
-  def tag(*packages)
+  desc 'tag-version [PACKAGES]', 'Tag package releases (default: package in current directory)'
+  option :all, type: :boolean, desc: 'Run on all packages'
+  def tag_version(*packages)
     require_commands! %w[git gbp]
+
+    packages = [ File.basename($current_dir) ] if packages.empty?
+    packages = [] if options[:all]
 
     tag_msg_format = 'Tag %(pkg)s %(version)s'
     user_kp = user_signingkey
@@ -104,10 +111,14 @@ class Version < Thor
     end
   end
 
-  desc 'push [PACKAGES]', 'Push packages to remote Git repos (default: all packages)'
+  desc 'push [PACKAGES]', 'Push packages to remote Git repos (default: package in current directory)'
+  option :all, type: :boolean, desc: 'Run on all packages'
   option :dry_run, type: :boolean
   def push(*packages)
     require_commands! %w[gbp]
+
+    packages = [ File.basename($current_dir) ] if packages.empty?
+    packages = [] if options[:all]
 
     opts = []
     opts.push('--dry-run') if options[:dry_run]
@@ -127,10 +138,14 @@ class Version < Thor
     end
   end
 
-  desc 'import-upstream [PACKAGES]', 'Import upstream source (default: all packages)'
+  desc 'import-upstream [PACKAGES]', 'Import upstream source (default: package in current directory)'
+  option :all, type: :boolean, desc: 'Run on all packages'
   def import_upstream(*packages)
     require_commands! %w[gbp git uscan]
     user_kp = user_signingkey
+
+    packages = [ File.basename($current_dir) ] if packages.empty?
+    packages = [] if options[:all]
 
     each_pkg(packages) do |pkg|
       format_file = 'debian/source/format'
