@@ -61,7 +61,7 @@ jobs:
 
       - name: Clone package repositories
         run: |
-          thor packages:clone
+          thor pkg:clone
 
       - name: Build
         run: |
