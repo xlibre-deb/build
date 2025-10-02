@@ -7,6 +7,8 @@ Layout/MultilineOperationIndentation:
   Enabled: false
 Layout/SpaceAroundOperators:
   Enabled: false
+Layout/SpaceInsideArrayLiteralBrackets:
+  Enabled: false
 Metrics/AbcSize:
   Enabled: false
 Metrics/BlockLength:
