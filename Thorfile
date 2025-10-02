@@ -1,4 +1,4 @@
-$current_dir = Dir.pwd # rubocop:disable Style/GlobalVars
+$current_dir = Dir.pwd
 Dir.chdir(__dir__)
 
 class << Thor
