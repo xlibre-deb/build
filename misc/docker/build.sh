@@ -8,6 +8,14 @@ if [ "$SYSTEMD" != true ]; then
   export DEB_BUILD_PROFILES=nosystemd
 fi
 
+CODENAME="$(. /etc/os-release && echo "$VERSION_CODENAME")"
+if [ "$CODENAME" == bookworm ] || [ "$CODENAME" == trixie ] \
+|| [ "$CODENAME" == daedalus ] || [ "$CODENAME" == excalibur ] \
+|| [ "$CODENAME" == noble ] || [ "$CODENAME" == plucky ] || [ "$CODENAME" == questing ]
+then
+  export DEB_BUILD_PROFILES="xatracker $DEB_BUILD_PROFILES"
+fi
+
 build() {
   path="$1"
   [ -d "$path" ] || return 0
