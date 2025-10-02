@@ -173,6 +173,17 @@ class Pkg < Thor
     end
   end
 
+  desc 'commit [GIT_OPTIONS]', 'Commit the changes with updated changelog'
+  def commit(*git_options)
+    require_commands! %w[gbp git]
+    Dir.chdir($current_dir) do
+      run! 'git', 'commit', *git_options
+      run! 'gbp', 'dch'
+      run! 'git', 'add', 'debian/changelog'
+      run! 'git', 'commit', '--amend', '--no-edit'
+    end
+  end
+
   no_commands do
     def set_envs!
       name = %x(git config --local user.name)
