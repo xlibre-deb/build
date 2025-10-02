@@ -1,5 +1,5 @@
 prefix: https://github.com/xlibre-deb/
-head: false
+head: true
 packages:
   xlibre: 1:7.8+4
   xlibre-server: 2:25.0.0.12-1
