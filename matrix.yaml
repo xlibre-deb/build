@@ -60,6 +60,7 @@ ubuntu:
   codenames:
   - noble
   - plucky
+  - questing
   suites:
   arch:
   - amd64
