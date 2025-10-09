@@ -19,6 +19,6 @@ packages:
   xserver-xlibre-video-qxl: 0.1.6.2-1
   xserver-xlibre-video-sisusb: 1:0.9.7.2-1
   xserver-xlibre-video-vesa: 1:2.6.0.3-1
-  xserver-xlibre-video-vmware: 1:13.4.0.3-1
+  xserver-xlibre-video-vmware: 1:13.4.0.3-2
   xserver-xlibre-video-voodoo: 1:1.2.6.2-1
   xorgproto: 2024.1-1~bpo+1
